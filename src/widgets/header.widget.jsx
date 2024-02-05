@@ -8,6 +8,7 @@ function Header(props) {
     return (
         <div style={{
             padding : '20px',
+            background : 'rgb(233, 237, 245)',
             display : 'flex',
             justifyContent : 'space-between'
         }}>
