@@ -1,6 +1,5 @@
 import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Tab, TabBar } from '@dhis2/ui';
 import React,{useState, useEffect} from 'react';
-import OrgUnits from './orgUnits.widget';
 import Periods from './periods.widget';
 import { useDataEngine } from '@dhis2/app-runtime';
 
@@ -9,9 +8,11 @@ function EditModal(props) {
     const engine = useDataEngine()
     const [open, setOpen] = useState(false)
     const [periodType, setPeriodType] = useState("Months");
-    const [selectedPeriods, setPeriods] = useState([])
+    const [selectedPeriods, setPeriods] = useState(['THIS_MONTH'])
     
     const submit = async() => {
+        console.log(selectedPeriods)
+        console.log(periodType)
         setOpen(false)
     }
 
