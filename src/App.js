@@ -2,26 +2,36 @@ import React from 'react'
 import { DataQuery } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import classes from './App.module.css'
+import { Center, CircularLoader, Layer } from '@dhis2/ui'
+import Index from './Index/Index'
 
 const query = {
     me: {
         resource: 'me',
     },
+    dataStore: {
+        resource: "dataStore",
+        params: {
+          paging: false,
+          fields: ["*"],
+        },
+      },
 }
 
 const MyApp = () => (
-    <div className={classes.container}>
+    <div>
         <DataQuery query={query}>
             {({ error, loading, data }) => {
-                if (error) return <span>ERROR</span>
-                if (loading) return <span>...</span>
+                if (error) return <span>{error}</span>
+                if (loading) return <Layer translucent>
+                    <Center>
+                        <CircularLoader />
+                    </Center>
+                </Layer>
                 return (
-                    <>
-                        <h1>
-                            {i18n.t('Hello {{name}}', { name: data.me.name })}
-                        </h1>
-                        <h3>{i18n.t('Welcome to DHIS2!')}</h3>
-                    </>
+                    <div>
+                       <Index data={data} styles={classes} />
+                    </div>
                 )
             }}
         </DataQuery>
