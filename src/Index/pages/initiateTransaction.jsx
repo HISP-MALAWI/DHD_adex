@@ -1,6 +1,7 @@
 import { Button, ButtonStrip, Field, Input, TextArea } from '@dhis2/ui';
 import React,{useState} from 'react';
 import EditModal from '../../widgets/editModal.widget';
+import Preview from '../../widgets/preview.widgets';
 
 function InitiateTransaction(props) {
     const [transName,setName] = useState()
@@ -39,6 +40,7 @@ function InitiateTransaction(props) {
                 </Field>
                 </div>
             </div>
+            <Preview />
             <div
             style={{
                 padding : '80px'

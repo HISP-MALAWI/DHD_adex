@@ -1,4 +1,4 @@
-import { NoticeBox } from '@dhis2/ui';
+import { NoticeBox,AlertBar } from '@dhis2/ui';
 import React from 'react';
 
 function Noticebox() {
