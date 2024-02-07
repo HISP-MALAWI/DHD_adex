@@ -20,12 +20,14 @@ function Header(props) {
                 margin : '10px',
                 fontFamily : 'sans-serif',
                 fontWeight : 'bold',
-                fontSize : 'larger'
+                fontSize : 'larger',
+                textDecoration: 'underline',
+                
             }}>
-                {props?.page === 'index' ? <>DashBoard</> : <>{props?.page === 'init' ? <>Initiate Transaction</> : <>Transaction Review</>}</>}
+                {props?.page === 'index' ? <>DASHBOARD</> : <>{props?.page === 'init' ? <>Initiate Transaction</> : <>Transaction Review</>}</>}
             </div>
             <Button className={props?.page !== 'index' && props?.styles?.hide} primary onClick={()=> props?.setPage('init')}>
-                Initialise Transaction
+                Initiate Transaction
             </Button>
             
         </div>
