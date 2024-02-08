@@ -10,3 +10,7 @@
 .hide {
     visibility: hidden;
 }
+.scrollable-table{
+    width: 100%;
+    overflow-x: scroll;
+}

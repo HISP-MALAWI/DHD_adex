@@ -1,10 +1,14 @@
 import { Table, TableBody, TableCell, TableCellHead, TableFoot, TableHead, TableRow, TableRowHead } from '@dhis2/ui'
-import React from 'react'
+import React,{useEffect} from 'react';
 
-export default function Preview() {
+
+export default function Preview(props) {
+    useEffect(()=>{
+        console.log(props)
+    },[])
   return (
     <div>
-      <Table>
+      <Table className={props.page === 'index' && props?.styles?.scrollable-table}>
     <TableHead>
         <TableRowHead>
             <TableCellHead>
@@ -36,7 +40,7 @@ export default function Preview() {
     <TableBody>
     <TableRow>
             <TableCell>
-            Acyclovir 200mg, tablets 
+            Acyclovir 200mg, tablets gdghjkfdghjkfdghjgfdghjdfghdfggdhdyrtgfrtedhrdfrtghgrtdfvghrtggytggrtfgrdgdvtdfgtgfghhfderfdfgfcxfgfvfcdfbgfdsfdbfgrdsfdfghfcxdsfdgfgfcdxfgfghtrfcdgfgvfcdffgvgfcgvcgfhgtfrdgfghfcghgfdgfxgfhgytfrdfrgfghfcdfgfgfcrgrgf
             </TableCell>
             <TableCell>
                 {Math.floor(Math.random()*(10000-100))}
