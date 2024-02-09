@@ -40,7 +40,7 @@ function InitiateTransaction(props) {
                 </Field>
                 </div>
             </div>
-            <Preview />
+            <Preview/>
             <div
             style={{
                 padding : '80px'
