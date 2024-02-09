@@ -7,29 +7,33 @@ import {
   TableRow,
   TableRowHead,
   Button,
+  DataTable,
+  DataTableRow,
+  DataTableColumnHeader,
+  DataTableCell,
 } from "@dhis2/ui";
 import React from "react";
 const transactions = [
   {
-    transactionId: "1",
+    transactionId: "TRMW-LMIS789",
     dateTime: "2024-02-07T13:41:21",
     createdBy: "Pemphero Mpande",
     status: "Draft",
   },
   {
-    transactionId: "2",
+    transactionId: "TRMW-LMIS208",
     dateTime: "2024-03-02T08:41:21",
     createdBy: "Max Mkutumula",
     status: "Success",
   },
   {
-    transactionId: "3",
+    transactionId: "TRMW-LMIS994",
     dateTime: "2024-01-05T16:41:21",
     createdBy: "Harry Cane",
     status: "In Progress",
   },
   {
-    transactionId: "4",
+    transactionId: "TRMW-LMIS256",
     dateTime: "2024-02-07T13:41:21",
     createdBy: "Danny Drinkwater",
     status: "Failed",
@@ -38,35 +42,55 @@ const transactions = [
 export default function Transactions() {
   return (
     <div>
-      <Table>
+      <DataTable scrollHeight="400px">
         <TableHead>
-          <TableRowHead>
-            <TableCellHead>Transaction ID</TableCellHead>
-            <TableCellHead>Date/Time</TableCellHead>
-            <TableCellHead>Created by</TableCellHead>
-            <TableCellHead>Status</TableCellHead>
-            <TableCellHead>Action</TableCellHead>
-          </TableRowHead>
+          <DataTableRow>
+            <DataTableColumnHeader fixed top="0">
+              Transaction ID
+            </DataTableColumnHeader>
+            <DataTableColumnHeader fixed top="0">
+              Date/Time
+            </DataTableColumnHeader>
+            <DataTableColumnHeader fixed top="0">
+              Created by
+            </DataTableColumnHeader>
+            <DataTableColumnHeader fixed top="0">
+              Status
+            </DataTableColumnHeader>
+            <DataTableColumnHeader fixed top="0">
+              Action
+            </DataTableColumnHeader>
+          </DataTableRow>
         </TableHead>
         <TableBody>
           {transactions.map((transaction, key) => {
             return (
-              <TableRow>
-                <TableCell>{transaction.transactionId}</TableCell>
-                <TableCell>
+              <DataTableRow>
+                <DataTableCell>{transaction.transactionId}</DataTableCell>
+                <DataTableCell>
                   {transaction.dateTime.split("T")[0]}{" "}
                   {transaction.dateTime.split("T")[1]}
-                </TableCell>
-                <TableCell>{transaction.createdBy}</TableCell>
-                <TableCell>{transaction.status}</TableCell>
-                <TableCell dense>
-                  <Button> View</Button>
-                </TableCell>
-              </TableRow>
+                </DataTableCell>
+                <DataTableCell>{transaction.createdBy}</DataTableCell>
+                <DataTableCell>{transaction.status}</DataTableCell>
+                <DataTableCell>
+                  <span
+                    style={{
+                      padding: 4,
+                      backgroundColor: "green",
+                      borderRadius: "10%",
+                      color: "whitesmoke",
+                      cursor: "pointer",
+                    }}
+                  >
+                    View
+                  </span>
+                </DataTableCell>
+              </DataTableRow>
             );
           })}
         </TableBody>
-      </Table>
+      </DataTable>
     </div>
   );
 }
