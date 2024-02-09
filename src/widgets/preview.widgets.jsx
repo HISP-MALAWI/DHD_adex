@@ -62,7 +62,9 @@ export default function Preview() {
         </TableRow>
         <TableRow>
             <TableCell>
+            <div>
             Benzhexol 5mg
+            </div>
             </TableCell>
             <TableCell>
             {Math.floor(Math.random()*(10000-100))}
