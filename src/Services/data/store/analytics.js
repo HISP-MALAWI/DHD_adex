@@ -7,15 +7,16 @@ let GetAnalytics = {
       joinedDataElements.push(dataElement);
     });
     let dataDimension = joinedDataElements?.join(";");
+    let joinedPE = period.join(";")
+    console.log()
     const analystisQuery = {
       analytics: {
-        resource: `analytics?dimension=dx:${dataDimension},ou:${orgUnit},pe:${period}&displayProperty=NAME&includeNumDen=true&skipMeta=false&skipData=false&includeMetadataDetails=true`,
+        resource: `analytics?dimension=dx:${dataDimension},ou:${orgUnit},pe:${joinedPE}&displayProperty=NAME&includeNumDen=true&skipMeta=false&skipData=false&includeMetadataDetails=true`,
         params: {},
       },
     };
-
     return engine.query(analystisQuery).then((res) => {
-      return res;
+    return res;
     });
   },
 };
