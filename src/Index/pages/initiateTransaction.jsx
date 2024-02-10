@@ -1,17 +1,60 @@
-import { Button, ButtonStrip, Field, Input, TextArea } from '@dhis2/ui';
-import React,{useState} from 'react';
+import { AlertBar, Button, ButtonStrip, Center, CircularLoader, Field, Input, Layer, TextArea } from '@dhis2/ui';
+import React,{useState, useEffect} from 'react';
 import EditModal from '../../widgets/editModal.widget';
 import Preview from '../../widgets/preview.widgets';
+import { useDataEngine } from '@dhis2/app-runtime';
+import GetAnalytics from '../../Services/data/store/analytics';
 
-function InitiateTransaction(props) {
+function    InitiateTransaction(props) {
+    const engine = useDataEngine()
+    const dataElementGroup = props?.data?.dataElementGroups?.dataElementGroups
+    const orgUnit = props?.data?.organisationUnits?.organisationUnits[0]
+    const [loading,setLoading] = useState(true)
+    const [hidden, setHidden] = useState(true)
+    const [message, setMessage] = useState('No data Elements found in  data element group')
     const [transName,setName] = useState()
     const [transDesc, setDesc] = useState()
+    const [analytics, setAnalytics] = useState()
+    const [periods, setPeriod] = useState(['THIS_MONTH'])
+
+    const fetchAnalytics = async() => {
+        const dataElements = dataElementGroup[0].dataElements
+        if(dataElements.length > 0){
+            setLoading(true)
+            let dataElementID = []
+            dataElements.map(dataElement => dataElementID.push(dataElement.id))
+            GetAnalytics.analytics(engine,dataElementID,periods,orgUnit.id)
+                .then(res =>{
+                    setAnalytics(res.analytics)
+                    setLoading(false)
+                } ).catch(()=>{
+                    setHidden(false)
+                    setLoading(false)        
+                })
+        }else{
+            setHidden(false)
+            setLoading(false)
+        }
+        console.log('changes')
+    }
+
+    useEffect(() =>{
+        fetchAnalytics()
+        console.log(periods)
+    },[periods])
     return (
+        <div>
+        {loading ? <Layer translucent>
+            <Center>
+                <CircularLoader />
+            </Center>
+        </Layer> : 
         <div style={{
             padding : '20px'
         }}>
+            
             <ButtonStrip end>
-                <EditModal />
+                <EditModal periods={periods} setPeriod = {setPeriod} />
             </ButtonStrip>
 
             <div
@@ -40,7 +83,7 @@ function InitiateTransaction(props) {
                 </Field>
                 </div>
             </div>
-            <Preview/>
+            <Preview analytics={analytics} key={analytics}/>
             <div
             style={{
                 padding : '80px'
@@ -49,6 +92,7 @@ function InitiateTransaction(props) {
                     <Button destructive>
                         Cancel
                     </Button>
+                    
                     <Button secondary>
                         Save as Draft
                     </Button>
@@ -57,7 +101,21 @@ function InitiateTransaction(props) {
                     </Button>
                 </ButtonStrip>
             </div>
+            <div style={{
+                position : 'absolute',
+                bottom : 0,
+                left : '50%',
+                left: '40%'
+            }}>
+                <AlertBar warning hidden={hidden} onHidden={()=> setHidden(true)} duration={2000}>
+                    {message}
+                </AlertBar>
+            </div>
+
         </div>
+        }
+        </div>        
+        
     );
 }
 
