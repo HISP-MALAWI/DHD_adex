@@ -28,6 +28,7 @@ function Index(props) {
         setLoading(false)
     }
     useEffect(()=>{
+        console.log(props)
         fetchTransactions()
     },[])
     return (
@@ -40,11 +41,11 @@ function Index(props) {
         </Center>
        </Layer>: 
         <>{page === 'index' ?
-            <Home initialisations={initialisations} />
+            <Home initialisations={initialisations} data={props?.data} />
             :
             <>
             {page === 'init' ? 
-            <InitiateTransaction /> : <>
+            <InitiateTransaction data={props?.data} /> : <>
                 <Center>
                     View Transaction
                 </Center>
