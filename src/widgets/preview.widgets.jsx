@@ -13,36 +13,11 @@ import GetAnalytics from "../Services/data/store/analytics";
 import { useDataEngine } from "@dhis2/app-runtime";
 import DataElementGroups from "../Services/data/store/dataElementGroups";
 
-export default function Preview() {
-  const engine = useDataEngine();
-  const [analytics, setAnalytics] = useState([]);
-  useEffect(() => {
-    DataElementGroups.dataElementGroups(engine).then((res) => {
-      console.log(res);
-    });
-    // GetAnalytics.analytics(
-    //   engine,
-    //   [
-    //     "FX640XO5V1C",
-    //     "KYVN98396QE",
-    //     "17H768X27B",
-    //     "0YY71FP4061",
-    //     "6OB7IWP255Y",
-    //     "5252T5C35SI",
-    //     "A4YEI2Q2PE8",
-    //     "T8XJ6AQ1WB4",
-    //     "79J4V0T3JZ2",
-    //     "R1J184BQHN2",
-    //     "CD2RNQCX1B1",
-    //     "U15D2KT93SU",
-    //   ],
-    //   "202204",
-    //   "lZsCb6y0KDX"
-    // ).then((res) => {
-    //   console.log(res);
-    // });
-  }, [analytics]);
+export default function Preview(props) {
 
+  useEffect(()=>{
+    console.log(props)
+  },[])
   return (
     <div>
       <Table>
