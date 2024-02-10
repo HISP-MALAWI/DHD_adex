@@ -8,11 +8,10 @@ function EditModal(props) {
     const engine = useDataEngine()
     const [open, setOpen] = useState(false)
     const [periodType, setPeriodType] = useState("Months");
-    const [selectedPeriods, setPeriods] = useState(['THIS_MONTH'])
+    const [selectedPeriods, setPeriods] = useState(props?.periods)
     
     const submit = async() => {
-        console.log(selectedPeriods)
-        console.log(periodType)
+        props?.setPeriod(selectedPeriods)
         setOpen(false)
     }
 
