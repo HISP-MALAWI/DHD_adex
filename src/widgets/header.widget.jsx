@@ -21,7 +21,6 @@ function Header(props) {
                 fontFamily : 'sans-serif',
                 fontWeight : 'bold',
                 fontSize : 'larger',
-                textDecoration: 'underline',
                 
             }}>
                 {props?.page === 'index' ? <>DASHBOARD</> : <>{props?.page === 'init' ? <>Initiate Transaction</> : <>Transaction Review</>}</>}
