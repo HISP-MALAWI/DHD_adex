@@ -41,11 +41,11 @@ function Index(props) {
         </Center>
        </Layer>: 
         <>{page === 'index' ?
-            <Home initialisations={initialisations} data={props?.data} />
+            <Home initialisations={initialisations} styles={props?.styles} data={props?.data} />
             :
             <>
             {page === 'init' ? 
-            <InitiateTransaction data={props?.data} /> : <>
+            <InitiateTransaction data={props?.data} styles={props?.styles} /> : <>
                 <Center>
                     View Transaction
                 </Center>
