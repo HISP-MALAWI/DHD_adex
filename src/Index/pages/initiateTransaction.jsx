@@ -82,7 +82,7 @@ function    InitiateTransaction(props) {
                 </Field>
                 </div>
             </div>
-            <Preview analytics={analytics} dataElements={dataElementGroup[0]?.dataElements} key={analytics}/>
+            <Preview analytics={analytics} styles={props?.styles} key={analytics}/>
             <div
             style={{
                 padding : '80px'
