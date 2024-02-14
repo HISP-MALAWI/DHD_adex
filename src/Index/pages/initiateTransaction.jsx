@@ -35,12 +35,11 @@ function    InitiateTransaction(props) {
             setHidden(false)
             setLoading(false)
         }
-        console.log('changes')
     }
 
     useEffect(() =>{
+        console.log(props)
         fetchAnalytics()
-        console.log(periods)
     },[periods])
     return (
         <div>
@@ -83,7 +82,7 @@ function    InitiateTransaction(props) {
                 </Field>
                 </div>
             </div>
-            <Preview analytics={analytics} key={analytics}/>
+            <Preview analytics={analytics} dataElements={dataElementGroup[0]?.dataElements} key={analytics}/>
             <div
             style={{
                 padding : '80px'
