@@ -42,6 +42,7 @@ export default function Preview(props) {
   }
 
   useEffect(()=>{
+    console.log(props)
     prepareAnalytics(props?.analytics)    
   },[])
 
@@ -57,6 +58,7 @@ export default function Preview(props) {
   
   return (
     <div style={{
+      padding : '5px',
       width : "100%",
       overflow : "scrollS"
     }}>
@@ -67,9 +69,9 @@ export default function Preview(props) {
             {analytics.map((val,index) =>{2022
               console.log(index)
               return( 
-            <TableCellHead colSpan={index== 0 ? '5': '4'} key={val?.period}>
+            <TableCellHead className={props.styles.border} colSpan={index== 0 ? '5': '4'} key={val?.period}>
               <div style={{
-                textAlign : 'center'
+                textAlign : 'center',
               }}>{val?.period}</div>
             </TableCellHead>
                 )})}
