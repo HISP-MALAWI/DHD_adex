@@ -84,7 +84,7 @@ export default function Preview(props) {
             <TableCellHead key={'Closing Balance'}>Closing Balance (Stock on Hand)</TableCellHead>
             <TableCellHead key={'qty'}>Quantity Used in Period</TableCellHead>
             <TableCellHead key={'stk'}>Stock Out Days</TableCellHead>
-            <TableCellHead key={'rc'}>Quantity Received</TableCellHead>
+            <TableCellHead className={props.styles.border} key={'rc'}>Quantity Received</TableCellHead>
             </>
             )} )}
           </TableRowHead>          
@@ -104,7 +104,7 @@ export default function Preview(props) {
             <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Stock on Hand'.toLocaleLowerCase()))[0].dataValues}</TableCell>
             <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Quantity used'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
             <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Stock Out Days'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
-            <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Quantity Received'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
+            <TableCell className={props.styles.border}>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Quantity Received'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
             </>
             )})}
           </TableRow>
