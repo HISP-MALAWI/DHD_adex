@@ -44,7 +44,7 @@ export default function Preview(props) {
   useEffect(()=>{
     console.log(props)
     prepareAnalytics(props?.analytics)    
-  },[])
+  },[props  ])
 
   useEffect(()=>{
     let x = []
@@ -67,7 +67,6 @@ export default function Preview(props) {
           
           <TableRowHead>
             {analytics.map((val,index) =>{2022
-              console.log(index)
               return( 
             <TableCellHead className={props.styles.border} colSpan={index== 0 ? '5': '4'} key={val?.period}>
               <div style={{
