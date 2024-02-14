@@ -42,7 +42,7 @@ function    InitiateTransaction(props) {
         fetchAnalytics()
     },[periods])
     return (
-        <div>
+        <div >
         {loading ? <Layer translucent>
             <Center>
                 <CircularLoader />
@@ -82,7 +82,12 @@ function    InitiateTransaction(props) {
                 </Field>
                 </div>
             </div>
+            <div style={{
+                maxWidth : '100%',
+                overflow : 'scroll'
+            }}>
             <Preview analytics={analytics} styles={props?.styles} key={analytics}/>
+            </div>
             <div
             style={{
                 padding : '80px'
