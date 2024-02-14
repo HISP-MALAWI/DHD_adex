@@ -62,7 +62,7 @@ export default function Preview(props) {
       width : "100%",
       overflow : "scrollS"
     }}>
-      <Table>
+      <Table className={props.styles.tb}>
         <TableHead>
           
           <TableRowHead>
@@ -101,7 +101,7 @@ export default function Preview(props) {
             <TableCell>{arr.join(' ')}</TableCell>
             {v.map(va =>{
             return(<>            
-            <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Stock on Hand'.toLocaleLowerCase()))[0].dataValues}</TableCell>
+            <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Stock on Hand'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
             <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Quantity used'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
             <TableCell>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Stock Out Days'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
             <TableCell className={props.styles.border}>{va[1].filter(el => el?.indicatorName.toLocaleLowerCase().includes('Quantity Received'.toLocaleLowerCase()))[0]?.dataValues}</TableCell>
