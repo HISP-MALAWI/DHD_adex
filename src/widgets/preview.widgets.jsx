@@ -62,7 +62,7 @@ export default function Preview(props) {
       width : "100%",
       overflow : "scrollS"
     }}>
-      <Table className={props.styles.tb}>
+      <Table className={props.styles.tb} >
         <TableHead>
           
           <TableRowHead>
