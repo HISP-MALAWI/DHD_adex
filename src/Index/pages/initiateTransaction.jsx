@@ -5,9 +5,12 @@ import Preview from '../../widgets/preview.widgets';
 import { useDataEngine } from '@dhis2/app-runtime';
 import GetAnalytics from '../../Services/data/store/analytics';
 import Noticebox from '../../widgets/noticeBox.widget';
+import axios from 'axios';
 
 function    InitiateTransaction(props) {
     const engine = useDataEngine()
+    const endpoint = ' https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis'
+    const token = '7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q'
     const dataElementGroup = props?.data?.dataElementGroups?.dataElementGroups
     const orgUnit = props?.data?.organisationUnits?.organisationUnits[0]
     const [loading,setLoading] = useState(true)
@@ -22,7 +25,6 @@ function    InitiateTransaction(props) {
     const [periods, setPeriod] = useState(['THIS_MONTH'])
 
     const fetchAnalytics = async() => {
-        console.log(hidden)
         const dataElements = dataElementGroup[0].dataElements
         if(dataElements.length > 0){
             setLoading(true)
@@ -54,6 +56,7 @@ function    InitiateTransaction(props) {
             description : transDesc,
             status : state
         }
+
         const myMutation = {
             resource : `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
             type: "create",
@@ -76,7 +79,32 @@ function    InitiateTransaction(props) {
 
     //this function sends data to Mediator application
     const pushToIL = async() => {
-        
+        const headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${TOKEN}`,
+          }
+          await axios.post(endpoint,JSON.stringify({
+            id : `OPEN-${Date.now()}`,
+            user_id : props?.data?.me.id,
+            analytics : analytics,  
+            name: transName,
+            description : transDesc,
+            status : state
+        }),{headers}).then(res => {
+            console.log(res)
+            setError(false)
+            setMessage('Data sucessifuly submit to Global fund')
+            setHidden(false)
+            pushToDataStore('success')
+        }).catch(e => {
+            console.log(e)
+            setError(true)
+            setMessage("Failled to submit data to datastore please try again some time")
+            setHidden(false)
+            pushToDataStore('failled')
+        })
+
     }
 
     const submit = async(trigger) =>{
