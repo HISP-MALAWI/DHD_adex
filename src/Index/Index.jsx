@@ -28,7 +28,6 @@ function Index(props) {
         setLoading(false)
     }
     useEffect(()=>{
-        console.log(props)
         fetchTransactions()
     },[])
     return (
