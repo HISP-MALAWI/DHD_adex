@@ -22,6 +22,7 @@ function    InitiateTransaction(props) {
     const [periods, setPeriod] = useState(['THIS_MONTH'])
 
     const fetchAnalytics = async() => {
+        console.log(hidden)
         const dataElements = dataElementGroup[0].dataElements
         if(dataElements.length > 0){
             setLoading(true)
@@ -48,29 +49,59 @@ function    InitiateTransaction(props) {
         const Object ={
             id : `OPEN-${Date.now()}`,
             user_id : props?.data?.me.id,
+            analytics : analytics,  
             name: transName,
             description : transDesc,
             status : state
         }
-        console.log(Object)
+        const myMutation = {
+            resource : `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
+            type: "create",
+            data : Object
+        }
+        await engine.mutate(myMutation).then(res => {
+            if(res.httpStatusCode == 200 || res.httpStatusCode == 201){
+                setError(false)
+                setMessage("Transaction successifuly saved to Datastore")
+                setHidden(false)
+                setTimeout(()=>props?.setPage('index'), 3000)
+            }
+        }).catch(e => {
+            setError(true)
+            setMessage("failed to save transaction to DataStore")
+            setHidden(false)
+        })
+        setLoading(false)
+    }
+
+    //this function sends data to Mediator application
+    const pushToIL = async() => {
+        
     }
 
     const submit = async(trigger) =>{
-        if(transName === undefined){
+        setLoading(true)
+        if(transName === undefined || transName.length === 0){
+            setLoading(true)
             setNameError(true)
             setMessage('Transaction name is required')
             setHidden(false)
-        }else if( transDesc === undefined){
-            setNameError(true)
-            setMessage('Transaction name is required')
+        }else if( transDesc === undefined || transDesc.length === 0){
+            setLoading(true)
+            setDescError(true)
+            setMessage('Transaction Description is required')
             setHidden(false)
         }else{
-            pushToDataStore(trigger)
+            if(trigger === 'Draft'){
+                pushToDataStore(trigger)
+            }else{
+                //pushing data to Snowflake
+            }
+            
         }
     }
 
     useEffect(() =>{
-        console.log( )
         fetchAnalytics()
     },[periods])
     return (
@@ -101,7 +132,10 @@ function    InitiateTransaction(props) {
                 }}>
                 <Field
                 label='Transaction name'>
-                    <Input name='TransID' error={nameError} onChange={(e) => setName(e.value)} />
+                    <Input name='TransID' error={nameError} onChange={(e) =>{
+                        setName(e.value)
+                        setNameError(false)
+                    } } />
                 </Field>
                 </div>
                 <div style={{
@@ -110,7 +144,10 @@ function    InitiateTransaction(props) {
                 }}>
                 <Field
                 label='Transaction Description'>
-                    <TextArea name='TransDesc' error={descError} onChange={(e) => setDesc(e.value)} />
+                    <TextArea name='TransDesc' error={descError} onChange={(e) => {
+                        setDesc(e.value)
+                        setDescError(false)    
+                    }} />
                 </Field>
                 </div>
             </div>
@@ -135,14 +172,14 @@ function    InitiateTransaction(props) {
                 padding : '80px'
             }}>
                 <ButtonStrip end>
-                    <Button destructive>
+                    <Button destructive onClick={() => props?.setPage('index')}>
                         Cancel
                     </Button>
                     
-                    <Button secondary>
+                    <Button secondary onClick={() => submit('draft')}>
                         Save as Draft
                     </Button>
-                    <Button primary>
+                    <Button primary onClick={()=>submit('success')}>
                         Submit
                     </Button>
                 </ButtonStrip>
