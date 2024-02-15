@@ -28,7 +28,6 @@ function    InitiateTransaction(props) {
         const dataElements = dataElementGroup[0].dataElements
         if(dataElements.length > 0){
             setLoading(true)
-            console.log(dataElements)
             let dataElementID = []
             dataElements.map(dataElement => dataElementID.push(dataElement.id))
             GetAnalytics.analytics(engine,dataElementID,periods,orgUnit.id)
@@ -50,13 +49,14 @@ function    InitiateTransaction(props) {
         let state = trigger === 'draft' ? 'draft' : trigger === 'success' ? 'success' : 'failed' 
         const Object ={
             id : `OPEN-${Date.now()}`,
-            user_id : props?.data?.me.id,
+            user_id : props?.data?.me,
             analytics : analytics,  
             name: transName,
+            date : new Date().toLocaleString(),
             description : transDesc,
             status : state
         }
-
+        console.log(Object)
         const myMutation = {
             resource : `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
             type: "create",
@@ -82,23 +82,22 @@ function    InitiateTransaction(props) {
         const headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
-            Authorization: `Bearer ${TOKEN}`,
+            Authorization: `Bearer ${token}`,
           }
           await axios.post(endpoint,JSON.stringify({
             id : `OPEN-${Date.now()}`,
-            user_id : props?.data?.me.id,
-            analytics : analytics,  
+            user_id : props?.data?.me,
+            analytics : {metadata : analytics.metaData.items,
+                        rows: analytics.rows}, 
+            date : new Date().toLocaleString(),
             name: transName,
             description : transDesc,
-            status : state
         }),{headers}).then(res => {
-            console.log(res)
             setError(false)
             setMessage('Data sucessifuly submit to Global fund')
             setHidden(false)
             pushToDataStore('success')
         }).catch(e => {
-            console.log(e)
             setError(true)
             setMessage("Failled to submit data to datastore please try again some time")
             setHidden(false)
@@ -124,6 +123,7 @@ function    InitiateTransaction(props) {
                 pushToDataStore(trigger)
             }else{
                 //pushing data to Snowflake
+                pushToIL()
             }
             
         }
@@ -134,11 +134,11 @@ function    InitiateTransaction(props) {
     },[periods])
     return (
         <div >
-        {loading ? <Layer translucent>
+        {loading && <Layer translucent>
             <Center>
                 <CircularLoader />
             </Center>
-        </Layer> : 
+        </Layer>}
         <div style={{
             padding : '20px'
         }}>
@@ -224,7 +224,7 @@ function    InitiateTransaction(props) {
             </div>
 
         </div>
-        }
+        
         
         </div>        
         
