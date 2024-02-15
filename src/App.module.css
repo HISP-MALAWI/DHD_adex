@@ -14,3 +14,10 @@
     width: 100%;
     overflow-x: scroll;
 }
+.border{
+    border-right: 2px solid;
+}
+.tb{
+    width: 100%;
+    overflow-x: scroll;
+}

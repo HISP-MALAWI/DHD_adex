@@ -21,7 +21,7 @@ const query = {
         params: {
             paging : false,
             filter: "name:eq:A_OpenLMIS ADEx",
-            fields: ["id,name,dataElements(id,name,code)"],
+            fields: ["id,name,dataElements(id,name,code,displayShortName)"],
         }
       },
       organisationUnits: {
