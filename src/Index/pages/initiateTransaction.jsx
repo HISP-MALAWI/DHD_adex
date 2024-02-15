@@ -13,6 +13,9 @@ function    InitiateTransaction(props) {
     const [loading,setLoading] = useState(true)
     const [hidden, setHidden] = useState(true)
     const [message, setMessage] = useState('No data Elements found in  data element group')
+    const [error,setError] = useState(true)
+    const [nameError,setNameError] = useState(false)
+    const [descError,setDescError] = useState(false)
     const [transName,setName] = useState()
     const [transDesc, setDesc] = useState()
     const [analytics, setAnalytics] = useState()
@@ -22,6 +25,7 @@ function    InitiateTransaction(props) {
         const dataElements = dataElementGroup[0].dataElements
         if(dataElements.length > 0){
             setLoading(true)
+            console.log(dataElements)
             let dataElementID = []
             dataElements.map(dataElement => dataElementID.push(dataElement.id))
             GetAnalytics.analytics(engine,dataElementID,periods,orgUnit.id)
@@ -38,7 +42,35 @@ function    InitiateTransaction(props) {
         }
     }
 
+    //pushing the to dataStore
+    const pushToDataStore =async(trigger) =>{
+        let state = trigger === 'draft' ? 'draft' : trigger === 'success' ? 'success' : 'failed' 
+        const Object ={
+            id : `OPEN-${Date.now()}`,
+            user_id : props?.data?.me.id,
+            name: transName,
+            description : transDesc,
+            status : state
+        }
+        console.log(Object)
+    }
+
+    const submit = async(trigger) =>{
+        if(transName === undefined){
+            setNameError(true)
+            setMessage('Transaction name is required')
+            setHidden(false)
+        }else if( transDesc === undefined){
+            setNameError(true)
+            setMessage('Transaction name is required')
+            setHidden(false)
+        }else{
+            pushToDataStore(trigger)
+        }
+    }
+
     useEffect(() =>{
+        console.log( )
         fetchAnalytics()
     },[periods])
     return (
@@ -69,7 +101,7 @@ function    InitiateTransaction(props) {
                 }}>
                 <Field
                 label='Transaction name'>
-                    <Input name='TransID' onChange={(e) => setName(e.value)} />
+                    <Input name='TransID' error={nameError} onChange={(e) => setName(e.value)} />
                 </Field>
                 </div>
                 <div style={{
@@ -78,7 +110,7 @@ function    InitiateTransaction(props) {
                 }}>
                 <Field
                 label='Transaction Description'>
-                    <TextArea name='TransDesc' onChange={(e) => setDesc(e.value)} />
+                    <TextArea name='TransDesc' error={descError} onChange={(e) => setDesc(e.value)} />
                 </Field>
                 </div>
             </div>
@@ -121,13 +153,14 @@ function    InitiateTransaction(props) {
                 left : '50%',
                 left: '40%'
             }}>
-                <AlertBar warning hidden={hidden} onHidden={()=> setHidden(true)} duration={2000}>
+                <AlertBar warning={error} success={!error} onHidden={()=> setHidden(true)} duration={2000}>
                     {message}
                 </AlertBar>
             </div>
 
         </div>
         }
+        
         </div>        
         
     );
