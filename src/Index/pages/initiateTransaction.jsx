@@ -52,7 +52,7 @@ function    InitiateTransaction(props) {
             user_id : props?.data?.me,
             analytics : analytics,  
             name: transName,
-            date : new Date().toLocaleString(),
+            date : new Date().toDateString(),
             description : transDesc,
             status : state
         }
@@ -89,7 +89,7 @@ function    InitiateTransaction(props) {
             user_id : props?.data?.me,
             analytics : {metadata : analytics.metaData.items,
                         rows: analytics.rows}, 
-            date : new Date().toLocaleString(),
+            date : new Date().toDateString(),
             name: transName,
             description : transDesc,
         }),{headers}).then(res => {
