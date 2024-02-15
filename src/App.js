@@ -9,7 +9,7 @@ const query = {
     me: {
         resource: 'me',
         params : {
-            fields: ['id,']
+            fields: ['id,name,email']
         }
     },
     dataStore: {
