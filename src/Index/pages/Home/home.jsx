@@ -13,7 +13,7 @@ function Home(props) {
       }}
     >
       {props?.initialisation != undefined ? (
-        <Noticebox />
+        <Noticebox message={'No transaction saved at moment. Please click the initalise transaction button at the top corner'} title={"No transaction"}/>
       ) : (
         <>
           <Transactions />
