@@ -45,7 +45,7 @@ function Index(props) {
             :
             <>
             {page === 'init' ? 
-            <InitiateTransaction data={props?.data} styles={props?.styles} /> : <>
+            <InitiateTransaction data={props?.data} styles={props?.styles} setPage={setPage} /> : <>
                 <Center>
                     View Transaction
                 </Center>
