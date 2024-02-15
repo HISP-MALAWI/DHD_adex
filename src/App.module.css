@@ -7,17 +7,43 @@
     justify-content: center;
     font-size: 1rem;
 }
+
 .hide {
     visibility: hidden;
 }
-.scrollable-table{
+
+.scrollable-table {
     width: 100%;
     overflow-x: scroll;
 }
-.border{
+
+.border {
     border-right: 2px solid;
 }
-.tb{
+
+.tb {
     width: 100%;
     overflow-x: scroll;
+}
+
+.statusBg {
+    background-color: green;
+    display: flex;
+    padding: 10;
+    border-radius: 10%;
+    color: whitesmoke;
+    cursor: pointer;
+    width: 100px;
+    height: 24px;
+    min-width: 100px;
+    text-align: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    z-index: 20,
+}
+
+.statusBg:hover {
+    background-color: #28a328;
 }

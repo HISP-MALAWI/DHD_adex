@@ -14,10 +14,7 @@ import {
 } from "@dhis2/ui";
 import React, { useEffect } from "react";
 import StatusStyleController from "../Services/data/controllers/statusStyleController";
-export default function Transactions({ transactions }) {
-  useEffect(() => {
-    console.log(transactions);
-  }, [transactions]);
+export default function Transactions({ transactions, styles }) {
   return (
     <div>
       <DataTable scrollHeight="400px">
@@ -63,7 +60,7 @@ export default function Transactions({ transactions }) {
                         flexDirection: "row",
                         justifyContent: "center",
                         alignItems: "center",
-                        textTransform:"capitalize",
+                        textTransform: "capitalize",
                         backgroundColor: StatusStyleController.backGroundColor(
                           transaction?.value?.status
                         ),
@@ -73,17 +70,7 @@ export default function Transactions({ transactions }) {
                     </span>
                   </DataTableCell>
                   <DataTableCell>
-                    <span
-                      style={{
-                        padding: 4,
-                        backgroundColor: "green",
-                        borderRadius: "10%",
-                        color: "whitesmoke",
-                        cursor: "pointer",
-                      }}
-                    >
-                      View
-                    </span>
+                    <span className={`${styles.statusBg}`}>View</span>
                   </DataTableCell>
                 </DataTableRow>
               );
