@@ -27,10 +27,10 @@ export default function Transactions({ transactions }) {
               Transaction ID
             </DataTableColumnHeader>
             <DataTableColumnHeader fixed top="0">
-              Date/Time
+              Date-Time
             </DataTableColumnHeader>
             <DataTableColumnHeader fixed top="0">
-              Created by
+              Created By
             </DataTableColumnHeader>
             <DataTableColumnHeader fixed top="0">
               Status
@@ -46,10 +46,7 @@ export default function Transactions({ transactions }) {
               return (
                 <DataTableRow key={key}>
                   <DataTableCell>{transaction?.value?.id}</DataTableCell>
-                  <DataTableCell>
-                    {transaction?.value?.date?.split(",")[0]}
-                    {transaction?.value?.date?.split("T")[1]}
-                  </DataTableCell>
+                  <DataTableCell>{transaction?.value?.date}</DataTableCell>
                   <DataTableCell>
                     {transaction?.value?.user_id?.name}
                   </DataTableCell>
