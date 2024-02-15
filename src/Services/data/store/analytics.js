@@ -8,7 +8,6 @@ let GetAnalytics = {
     });
     let dataDimension = joinedDataElements?.join(";");
     let joinedPE = period.join(";")
-    console.log()
     const analystisQuery = {
       analytics: {
         resource: `analytics?dimension=dx:${dataDimension},ou:${orgUnit},pe:${joinedPE}&displayProperty=NAME&includeNumDen=true&skipMeta=false&skipData=false&includeMetadataDetails=true`,

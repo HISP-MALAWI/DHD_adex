@@ -8,6 +8,9 @@ import Index from './Index/Index'
 const query = {
     me: {
         resource: 'me',
+        params : {
+            fields: ['id,name,email']
+        }
     },
     dataStore: {
         resource: "dataStore",

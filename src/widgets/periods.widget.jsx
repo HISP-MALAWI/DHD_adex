@@ -11,9 +11,6 @@ function Periods(props) {
     
     const [Options, setOptions] = useState([...periodOptions.relativePeriod(),...periodOptions.fixedPeriod(year)])
 
-    useEffect(()=>{
-      console.log(props)
-    },[])
     const changeYear = (yr)=>{
         let pe = Options;
         setYear(yr)
