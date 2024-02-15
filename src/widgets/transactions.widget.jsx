@@ -53,9 +53,17 @@ export default function Transactions({ transactions }) {
                   <DataTableCell>
                     <span
                       style={{
+                        display: "flex",
                         padding: 4,
                         borderRadius: "5px",
                         color: "white",
+                        width: "100px",
+                        minWidth: "100px",
+                        textAlign: "center",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textTransform:"capitalize",
                         backgroundColor: StatusStyleController.backGroundColor(
                           transaction?.value?.status
                         ),
