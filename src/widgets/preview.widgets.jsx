@@ -44,7 +44,6 @@ export default function Preview(props) {
   }
 
   useEffect(()=>{
-    console.log(props)
     prepareAnalytics(props?.analytics)    
   },[props  ])
 
