@@ -39,7 +39,6 @@ function    InitiateTransaction(props) {
     }
 
     useEffect(() =>{
-        console.log(props)
         fetchAnalytics()
     },[periods])
     return (
