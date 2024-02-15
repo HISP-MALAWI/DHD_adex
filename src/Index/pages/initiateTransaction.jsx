@@ -14,7 +14,7 @@ function    InitiateTransaction(props) {
     const dataElementGroup = props?.data?.dataElementGroups?.dataElementGroups
     const orgUnit = props?.data?.organisationUnits?.organisationUnits[0]
     const [loading,setLoading] = useState(true)
-    const [hidden, setHidden] = useState(true)
+    const [hide, setHidden] = useState(true)
     const [message, setMessage] = useState('No data Elements found in  data element group')
     const [error,setError] = useState(true)
     const [nameError,setNameError] = useState(false)
@@ -52,7 +52,7 @@ function    InitiateTransaction(props) {
             user_id : props?.data?.me,
             analytics : analytics,  
             name: transName,
-            date : new Date().toLocaleString(),
+            date : new Date().toDateString(),
             description : transDesc,
             status : state
         }
@@ -89,7 +89,7 @@ function    InitiateTransaction(props) {
             user_id : props?.data?.me,
             analytics : {metadata : analytics.metaData.items,
                         rows: analytics.rows}, 
-            date : new Date().toLocaleString(),
+            date : new Date().toDateString(),
             name: transName,
             description : transDesc,
         }),{headers}).then(res => {
@@ -218,7 +218,7 @@ function    InitiateTransaction(props) {
                 left : '50%',
                 left: '40%'
             }}>
-                <AlertBar warning={error} success={!error} onHidden={()=> setHidden(true)} duration={2000}>
+                <AlertBar warning={error} success={!error} hidden={hide} onHidden={()=> setHidden(true)} duration={2000}>
                     {message}
                 </AlertBar>
             </div>
