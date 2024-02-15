@@ -4,6 +4,7 @@ import EditModal from '../../widgets/editModal.widget';
 import Preview from '../../widgets/preview.widgets';
 import { useDataEngine } from '@dhis2/app-runtime';
 import GetAnalytics from '../../Services/data/store/analytics';
+import Noticebox from '../../widgets/noticeBox.widget';
 
 function    InitiateTransaction(props) {
     const engine = useDataEngine()
@@ -83,11 +84,21 @@ function    InitiateTransaction(props) {
                 </div>
             </div>
             <div style={{
+                padding: '10px',
+                textAlign:'center',
+
+            }}>
+                <h3>Data Preview</h3>
+            </div>
+            {analytics?.rows.length > 0 ?
+            <div style={{
                 maxWidth : '100%',
                 overflow : 'scroll'
             }}>
             <Preview analytics={analytics} styles={props?.styles} key={analytics}/>
-            </div>
+            </div> :
+            <Noticebox title={'No datavalues found'} message={"No datavalues found please change the selected periods and try again"} />
+            }
             <div
             style={{
                 padding : '80px'
