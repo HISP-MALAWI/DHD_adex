@@ -13,10 +13,12 @@ import GetAnalytics from "../Services/data/store/analytics";
 import { useDataEngine } from "@dhis2/app-runtime";
 import _, { values } from 'lodash'
 import DataElementGroups from "../Services/data/store/dataElementGroups";
+import Noticebox from "./noticeBox.widget";
 
 export default function Preview(props) {
   const [analytics,setAnalytics] = useState([])
   const [vs,setVs] = useState([])
+  let rws = props?.analytics?.rows.length
   let peArr = []
 
   const prepareAnalytics = (analytics) => {
@@ -114,5 +116,6 @@ export default function Preview(props) {
         </TableFoot>
       </Table>
     </div>
+    
   );
 }
