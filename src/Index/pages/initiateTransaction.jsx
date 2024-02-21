@@ -204,10 +204,10 @@ function    InitiateTransaction(props) {
                         Cancel
                     </Button>
                     
-                    <Button secondary onClick={() => submit('draft')}>
+                    <Button secondary disabled={analytics?.rows?.length < 0 || analytics?.rows?.length === undefined} onClick={() => submit('draft')}>
                         Save as Draft
                     </Button>
-                    <Button primary onClick={()=>submit('success')}>
+                    <Button primary disabled={analytics?.rows?.length < 0 || analytics?.rows?.length === undefined} onClick={()=>submit('success')}>
                         Submit
                     </Button>
                 </ButtonStrip>
