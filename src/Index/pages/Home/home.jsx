@@ -43,7 +43,7 @@ function Home(props) {
       ) : (
         <>
           {transactions && transactions?.length > 0 ? (
-            <Transactions transactions={transactions} />
+            <Transactions transactions={transactions} styles={props?.styles}/>
           ) : (
             <span style={{ color: "red", textAlign: "center" }}>
               Transactions will be Loaded here or no transations are available!
