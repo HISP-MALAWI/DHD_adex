@@ -7,13 +7,12 @@ import GetAnalytics from '../../Services/data/store/analytics';
 import Noticebox from '../../widgets/noticeBox.widget';
 import axios from 'axios';
 
-function InitiateTransaction(props) {
+function PreviewTransaction(props) {
     const engine = useDataEngine()
     const endpoint = ' https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis'
     const token = '7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q'
     const dataElementGroup = props?.data?.dataElementGroups?.dataElementGroups
     const orgUnit = props?.data?.organisationUnits?.organisationUnits[0]
-    
     const [loading,setLoading] = useState(true)
     const [hide, setHidden] = useState(true)
     const [message, setMessage] = useState('No data Elements found in  data element group')
@@ -109,109 +108,125 @@ function InitiateTransaction(props) {
 
     const submit = async(trigger) =>{
         setLoading(true)
-        props?.setPage("previewTransaction")
+        if(transName === undefined || transName.length === 0){
+            setLoading(true)
+            setNameError(true)
+            setMessage('Transaction name is required')
+            setHidden(false)
+        }else if( transDesc === undefined || transDesc.length === 0){
+            setLoading(true)
+            setDescError(true)
+            setMessage('Transaction Description is required')
+            setHidden(false)
+        }else{
+            if(trigger === 'Draft'){
+                pushToDataStore(trigger)
+            }else{
+                //pushing data to Snowflake
+                pushToIL()
+            }
+            
+        }
     }
 
     useEffect(() =>{
         fetchAnalytics()
     },[periods])
+
     return (
         <div >
-        {loading && <Layer translucent>
-            <Center>
-                <CircularLoader />
-            </Center>
-        </Layer>}
-        <div style={{
-            padding : '20px'
-        }}>
-            
-            <ButtonStrip end>
-                <EditModal periods={periods} setPeriod = {setPeriod} />
-            </ButtonStrip>
-
-            <div
-                style={{
-                    marginTop : '10px',
-                    padding : '20px',
-                }}
-            >
-                <div style={{
-                    padding : '10px',
-                    width : '50%',
-                    
-                }}>
-                <Field
-                label='Transaction name'>
-                    <Input name='TransID' error={nameError} onChange={(e) =>{
-                        setName(e.value)
-                        setNameError(false)
-                    } } />
-                </Field>
-                </div>
-                <div style={{
-                    padding : '10px',
-                    width : '50%'
-                }}>
-                <Field
-                label='Transaction Description'>
-                    <TextArea name='TransDesc' error={descError} onChange={(e) => {
-                        setDesc(e.value)
-                        setDescError(false)    
-                    }} />
-                </Field>
-                </div>
-            </div>
+            {loading && <Layer translucent>
+                <Center>
+                    <CircularLoader />
+                </Center>
+            </Layer>}
             <div style={{
-                padding: '10px',
-                textAlign:'center',
-
+                padding : '20px'
             }}>
-                <h3>Data Preview</h3>
-            </div>
-            {analytics?.rows.length > 0 ?
-            <div style={{
-                maxWidth : '100%',
-                overflow : 'scroll'
-            }}>
-            <Preview analytics={analytics} styles={props?.styles} key={analytics}/>
-            </div> :
-            <Noticebox title={'No datavalues found'} message={"No datavalues found please change the selected periods and try again"} />
-            }
-            <div
-            style={{
-                padding : '80px'
-            }}>
+                
                 <ButtonStrip end>
-                    <Button destructive onClick={() => props?.setPage('index')}>
-                        Cancel
-                    </Button>
-                    
-                    <Button secondary disabled={analytics?.rows?.length < 0 || analytics?.rows?.length === undefined} onClick={() => submit('draft')}>
-                        Save as Draft
-                    </Button>
-                    <Button primary disabled={analytics?.rows?.length < 0 || analytics?.rows?.length === undefined} onClick={()=>submit('success')}>
-                        Submit
-                    </Button>
+                    Periods here
                 </ButtonStrip>
-            </div>
-            <div style={{
-                position : 'absolute',
-                bottom : 0,
-                left : '50%',
-                left: '40%'
-            }}>
-                <AlertBar warning={error} success={!error} hidden={hide} onHidden={()=> setHidden(true)} duration={2000}>
-                    {message}
-                </AlertBar>
-            </div>
 
-        </div>
-        
-        
+                <div
+                    style={{
+                        marginTop : '10px',
+                        padding : '20px',
+                    }}
+                >
+                    <div style={{
+                        padding : '10px',
+                        width : '50%',
+                        
+                    }}>
+                    <Field
+                    label='Transaction name'>
+                        <Input name='TransID' error={nameError} disabled onChange={(e) =>{
+                            setName(e.value)
+                            setNameError(false)
+                        } } />
+                    </Field>
+                    </div>
+                    <div style={{
+                        padding : '10px',
+                        width : '50%'
+                    }}>
+                    <Field
+                    label='Transaction Description'>
+                        <TextArea name='TransDesc' disabled error={descError} onChange={(e) => {
+                            setDesc(e.value)
+                            setDescError(false)    
+                        }} />
+                    </Field>
+                    </div>
+                </div>
+                <div style={{
+                    padding: '10px',
+                    textAlign:'center',
+
+                }}>
+                    <h3>Data Preview</h3>
+                </div>
+                {analytics?.rows.length > 0 ?
+                <div style={{
+                    maxWidth : '100%',
+                    overflow : 'scroll'
+                }}>
+                <Preview analytics={analytics} styles={props?.styles} key={analytics}/>
+                </div> :
+                <Noticebox title={'No datavalues found'} message={"No datavalues found please change the selected periods and try again"} />
+                }
+                <div
+                style={{
+                    padding : '80px'
+                }}>
+                    <ButtonStrip end>
+                        <Button destructive onClick={() => props?.setPage('index')}>
+                            Cancel
+                        </Button>
+                        
+                        <Button secondary disabled={analytics?.rows?.length < 0 || analytics?.rows?.length === undefined} onClick={() => submit('draft')}>
+                            Save as Draft
+                        </Button>
+                        <Button primary disabled={analytics?.rows?.length < 0 || analytics?.rows?.length === undefined} onClick={()=>submit('success')}>
+                            Submit
+                        </Button>
+                    </ButtonStrip>
+                </div>
+                <div style={{
+                    position : 'absolute',
+                    bottom : 0,
+                    left : '50%',
+                    left: '40%'
+                }}>
+                    <AlertBar warning={error} success={!error} hidden={hide} onHidden={()=> setHidden(true)} duration={2000}>
+                        {message}
+                    </AlertBar>
+                </div>
+            </div>
         </div>        
         
     );
 }
 
-export default InitiateTransaction;
+export default PreviewTransaction;

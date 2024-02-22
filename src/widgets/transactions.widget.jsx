@@ -14,7 +14,9 @@ import {
 } from "@dhis2/ui";
 import React, { useEffect } from "react";
 import StatusStyleController from "../Services/data/controllers/statusStyleController";
-export default function Transactions({ transactions, styles }) {
+
+export default function Transactions({ transactions, styles, setPage}) {
+    
   return (
     <div>
       <DataTable scrollHeight="400px">
@@ -70,7 +72,7 @@ export default function Transactions({ transactions, styles }) {
                     </span>
                   </DataTableCell>
                   <DataTableCell>
-                    <span className={`${styles.statusBg}`}>View</span>
+                    <span className={`${styles.statusBg}`} onClick={() => setPage("previewTransaction")}>View</span>
                   </DataTableCell>
                 </DataTableRow>
               );

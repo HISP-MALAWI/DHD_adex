@@ -2,8 +2,10 @@ import { ButtonStrip, Center, CircularLoader, Layer } from "@dhis2/ui";
 import React, { useEffect, useState } from "react";
 import Header from "../widgets/header.widget";
 import InitiateTransaction from "./pages/initiateTransaction";
+import PreviewTransaction from "./pages/previewTransaction";
 import { useDataEngine } from "@dhis2/app-runtime";
 import Home from "./pages/Home/home";
+import Preview from "../widgets/preview.widgets";
 
 function Index(props) {
   const engine = useDataEngine();
@@ -45,7 +47,9 @@ function Index(props) {
             <Home
               initialisations={initialisations}
               styles={props?.styles}
-              data={props?.data}
+              data={props?.data} 
+              page={page} 
+              setPage={setPage}
             />
           ) : (
             <>
@@ -53,10 +57,22 @@ function Index(props) {
                 <InitiateTransaction
                   data={props?.data}
                   styles={props?.styles}
+                  setPage={setPage}
                 />
               ) : (
                 <>
-                  <Center>View Transaction</Center>
+                {page === "previewTransaction" ? (
+                  <PreviewTransaction
+                    data={props?.data}
+                    styles={props?.styles}
+                    preview={true}
+                    loading={loading}
+                  />
+                ) : (
+                  <>
+                    <Center>View Transaction</Center>
+                  </>
+                )} 
                 </>
               )}
             </>
