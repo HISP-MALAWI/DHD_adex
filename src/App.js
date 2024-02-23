@@ -9,6 +9,7 @@ import { ReactRouter6Adapter } from "use-query-params/adapters/react-router-6";
 import { HashRouter, Routes, Route, BrowserRouter } from "react-router-dom";
 import { QueryParamProvider } from "use-query-params";
 import InitiateTransaction from "./Index/pages/initiateTransaction";
+import TransactionPreview from "./Index/pages/Home/transactionpreview";
 const query = {
   me: {
     resource: "me",
@@ -78,7 +79,7 @@ const MyApp = ({ router: Router }) => (
                   <Route
                     path="/transaction"
                     element={
-                      <InitiateTransaction data={data} styles={classes} />
+                      <TransactionPreview analytics={data} styles={classes} />
                     }
                     exact
                   />

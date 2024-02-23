@@ -15,8 +15,8 @@ import Preview from "../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
 import GetAnalytics from "../../Services/data/store/analytics";
 import Noticebox from "../../widgets/noticeBox.widget";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function InitiateTransaction(props) {
   const engine = useDataEngine();
