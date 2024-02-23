@@ -4,6 +4,7 @@ import Header from "../widgets/header.widget";
 import InitiateTransaction from "./pages/initiateTransaction";
 import { useDataEngine } from "@dhis2/app-runtime";
 import Home from "./pages/Home/home";
+import NavigationBar from "../widgets/NavigationBar";
 
 function Index(props) {
   const engine = useDataEngine();
@@ -32,7 +33,8 @@ function Index(props) {
   }, []);
   return (
     <div>
-      <Header page={page} setPage={setPage} styles={props?.styles} />
+      <NavigationBar />
+      {/* <Header page={page} setPage={setPage} styles={props?.styles} /> */}
       {loading ? (
         <Layer translucent>
           <Center>
