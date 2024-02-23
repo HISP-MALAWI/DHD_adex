@@ -1,4 +1,5 @@
-import { Box, Card, NoticeBox } from "@dhis2/ui";
+import { Box, Card, NoticeBox, Button } from "@dhis2/ui";
+import { Link} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
@@ -52,32 +53,33 @@ export default function TransactionPreview(props) {
 
   return (
     <div>
+      <div style={{width: "100", backgroundColor: "#f1f2f5", padding: 10}}>
+        <Button small primary>
+          <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>Back</Link>
+        </Button>
+      </div>
       <div
         className=""
-        style={{ display: "flex", flexDirection: "row", gap: 10, padding: 10 }}
+        style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: 10, flexWrap: "wrap", justifyContent: "center", gap: 10 }}
       >
         <div>
           <NoticeBox title="Transaction Identification">
-            Data shown in this dashboard may take a few hours to update.
-            Scheduled dashboard updates can be managed in the scheduler app.
+           {id}
           </NoticeBox>
         </div>
         <div className="">
           <NoticeBox title="Description">
-            Data shown in this dashboard may take a few hours to update.
-            Scheduled dashboard updates can be managed in the scheduler app.
+            {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.description}
           </NoticeBox>
         </div>
         <div className="">
           <NoticeBox title="Creadted By:">
-            Data shown in this dashboard may take a few hours to update.
-            Scheduled dashboard updates can be managed in the scheduler app.
+            {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.user_id.name}
           </NoticeBox>
         </div>
         <div className="">
           <NoticeBox title="Status Summary:">
-            Data shown in this dashboard may take a few hours to update.
-            Scheduled dashboard updates can be managed in the scheduler app.
+             {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.status}
           </NoticeBox>
         </div>
       </div>
