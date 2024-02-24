@@ -1,4 +1,4 @@
-import { Box, Card, NoticeBox, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell } from "@dhis2/ui";
+import { Box, Card, NoticeBox, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip } from "@dhis2/ui";
 import { Link, useLocation} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
@@ -45,10 +45,16 @@ export default function TransactionPreview(props) {
   },[transactions])
   return (
     <div>
-      <div style={{width: "100", backgroundColor: "#f1f2f5", padding: 10}}>
-        <Button basic>
-          <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>Back</Link>
+      <div style={{width: "100", display:'flex',justifyContent:'space-between', padding: 10}}>
+      <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>
+        <Button secondary>
+          Back
         </Button>
+        </Link>
+        <div>
+          Transaction preview
+        </div>
+        <div className={props?.styles?.hide}></div>
       </div>
       <div
         className=""
@@ -98,6 +104,7 @@ export default function TransactionPreview(props) {
             />
 }
       </div>
+      
     </div>
   );
 }
