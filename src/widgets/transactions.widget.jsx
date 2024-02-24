@@ -122,7 +122,7 @@ export default function Transactions({ styles }) {
                         style={{ textDecoration: "none" }}
                         to={{
                           pathname: "/transaction",
-                          search: `id=${transaction?.value?.id}`,
+                          search: `id=${transaction?.key}`,
                         }}
                       >
                         View
