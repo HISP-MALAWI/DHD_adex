@@ -1,4 +1,4 @@
-import { Box, Card, NoticeBox, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip } from "@dhis2/ui";
+import { Box, Card, NoticeBox, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip, Layer, Center, CircularLoader } from "@dhis2/ui";
 import { Link, useLocation} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
@@ -31,20 +31,21 @@ export default function TransactionPreview(props) {
     };
     try {
       const res = await engine.query(myQuery);
-      setTransactions(res?.dataStore)      
+      setTransactions(res?.dataStore)
+      setLoading(false)      
     } catch (e) {
+      setLoading(false)
       console.log(e);
     }
   };
   useEffect(() => {
     getTransactions(location.search.split('=')[1]);    
   }, []);
-
-  useEffect(()=>{
-    console.log(transactions)
-  },[transactions])
   return (
     <div>
+      {loading && <Layer translucent>
+        <Center>
+          <CircularLoader /></Center></Layer>}
       <div style={{width: "100", display:'flex',justifyContent:'space-between', padding: 10}}>
       <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>
         <Button secondary>
@@ -104,7 +105,13 @@ export default function TransactionPreview(props) {
             />
 }
       </div>
-      
+      <div style={{padding : '10px'}}>
+      <ButtonStrip end>
+      {transactions?.status === 'draft' && <Button primary onclick={()=> console.log(transactions)}>
+          Submit
+        </Button>}
+      </ButtonStrip>
+      </div>
     </div>
   );
 }
