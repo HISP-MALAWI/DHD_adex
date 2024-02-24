@@ -36,6 +36,7 @@ function InitiateTransaction(props) {
   const [transDesc, setDesc] = useState();
   const [analytics, setAnalytics] = useState();
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
+  const [disabled, setDisabled] = useState(true)
 
   const fetchAnalytics = async () => {
     const dataElements = dataElementGroup[0].dataElements;
@@ -141,12 +142,12 @@ function InitiateTransaction(props) {
   const submit = async (trigger) => {
     setLoading(true);
     if (transName === undefined || transName.length === 0) {
-      setLoading(true);
+      setLoading(false);
       setNameError(true);
       setMessage("Transaction name is required");
       setHidden(false);
     } else if (transDesc === undefined || transDesc.length === 0) {
-      setLoading(true);
+      setLoading(false);
       setDescError(true);
       setMessage("Transaction Description is required");
       setHidden(false);
@@ -163,6 +164,12 @@ function InitiateTransaction(props) {
   useEffect(() => {
     fetchAnalytics();
   }, [periods]);
+
+  useEffect(()=>{
+    if(analytics?.rows.length > 0){
+        setDisabled(false)
+    }
+  },[analytics])
   return (
     <div>
       {loading && (
@@ -192,6 +199,9 @@ function InitiateTransaction(props) {
               Back
             </Link>
           </Button>
+          <div>
+            Initiate Transaction
+          </div>
           <ButtonStrip end>
             <EditModal periods={periods} setPeriod={setPeriod} />
           </ButtonStrip>
@@ -272,14 +282,10 @@ function InitiateTransaction(props) {
           }}
         >
           <ButtonStrip end>
-            <Button destructive onClick={() => props?.setPage("index")}>
-              Cancel
-            </Button>
-
-            <Button secondary onClick={() => submit("draft")}>
+            <Button secondary disabled={disabled} onClick={() => submit("draft")}>
               Save as Draft
             </Button>
-            <Button primary onClick={() => submit("success")}>
+            <Button primary disabled={disabled} onClick={() => submit("success")}>
               Submit
             </Button>
           </ButtonStrip>
