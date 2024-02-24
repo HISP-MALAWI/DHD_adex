@@ -18,12 +18,31 @@ import Noticebox from "../../widgets/noticeBox.widget";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+const myQuery ={
+    dataElementGroups: {
+        resource: "dataElementGroups",
+        params: {
+          paging: false,
+          filter: "name:eq:A_OpenLMIS ADEx",
+          fields: ["id,name,dataElements(id,name,code,displayShortName)"],
+        },
+      },
+      organisationUnits: {
+        resource: "organisationUnits",
+        params: {
+          paging: false,
+          filter: "name:eq:MOH MALAWI Govt",
+          fields: ["id,name,level,path,displayName,code"],
+        },
+      },
+}
+
 function InitiateTransaction(props) {
   const engine = useDataEngine();
   const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
-  const dataElementGroup = props?.data?.dataElementGroups?.dataElementGroups;
-  const orgUnit = props?.data?.organisationUnits?.organisationUnits[0];
+  const [dataElementGroup, setElementGroupe] = useState([])
+  const [orgUnit,setOU] = useState([])
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
@@ -38,9 +57,23 @@ function InitiateTransaction(props) {
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
   const [disabled, setDisabled] = useState(true)
 
+  const fetchData = async () => {
+    setLoading(true)
+    await engine.query(myQuery).then(res => {
+        console.log(res)
+        setElementGroupe(res?.dataElementGroups?.dataElementGroups[0])
+        setOU(res?.organisationUnits?.organisationUnits[0])
+        setLoading(false)
+    }).catch(error => {
+        setLoading(false)
+        setHidden(false)
+        setMessage(error)
+    })
+  }
+
   const fetchAnalytics = async () => {
-    const dataElements = dataElementGroup[0].dataElements;
-    if (dataElements.length > 0) {
+    const dataElements = dataElementGroup.dataElements;
+    if (dataElements?.length > 0) {
       setLoading(true);
       let dataElementID = [];
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
@@ -161,9 +194,13 @@ function InitiateTransaction(props) {
     }
   };
 
+  useEffect(()=>{
+      fetchData()
+  },[])
+
   useEffect(() => {
     fetchAnalytics();
-  }, [periods]);
+  }, [periods,dataElementGroup,orgUnit]);
 
   useEffect(()=>{
     if(analytics?.rows.length > 0){
