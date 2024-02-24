@@ -10,7 +10,7 @@ export default function TransactionPreview(props) {
   const location = useLocation()
   const [loading, setLoading] = useState(true);
   const engine = useDataEngine();
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState({});
 
   //   query params
   // const{id}=useParams();
@@ -31,17 +31,7 @@ export default function TransactionPreview(props) {
     };
     try {
       const res = await engine.query(myQuery);
-      console.log(res)
-      if (res.dataStore == undefined || res.dataStore == null) {
-        setLoading(true);
-      } else {
-        if (res?.dataStore?.length == 0) {
-          setLoading(false);
-        } else {
-          setLoading(false);
-          setTransactions(res?.dataStore);
-        }
-      }
+      setTransactions(res?.dataStore)      
     } catch (e) {
       console.log(e);
     }
@@ -84,40 +74,30 @@ export default function TransactionPreview(props) {
           <StackedTableBody>
             <StackedTableRow>
               <StackedTableCell>
-                {transactions.id}
+                {transactions?.id}
               </StackedTableCell>
               <StackedTableCell>
-                {transactions.name}
+                {transactions?.name}
               </StackedTableCell>
               <StackedTableCell>
-                {transactions.description}
+                {transactions?.description}
               </StackedTableCell>
               <StackedTableCell>
-                {transactions.status}
+                {transactions?.status}
               </StackedTableCell>
             </StackedTableRow>
           </StackedTableBody>
         </StackedTable>
       </div>
-      {/* <div className="">
-        {transactions.filter(
-          (transaction) => transaction?.value?.id == id
-        )[0] == null ||
-          (transactions.filter(
-            (transaction) => transaction?.value?.id == id
-          )[0] == undefined ? (
-            <spa></spa>
-          ) : (
-            // <Preview
-            //   analytics={
-            //     transactions.filter(
-            //       (transaction) => transaction?.value?.id == id
-            //     )[0]?.value?.analytics
-            //   }
-            //   styles={props.styles}
-            // />
-          ))}
-      </div> */}
+      <div className="">
+        {transactions?.analytics !== undefined && 
+         <Preview
+              analytics={transactions?.analytics
+              }
+              styles={props.styles}
+            />
+}
+      </div>
     </div>
   );
 }
