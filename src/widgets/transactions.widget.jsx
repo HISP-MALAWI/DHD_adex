@@ -47,7 +47,6 @@ export default function Transactions({ styles }) {
         }
       }
     } catch (e) {
-      console.log(e);
     }
   };
   useEffect(() => {
