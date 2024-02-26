@@ -26,7 +26,7 @@ function Home(props) {
   };
   useEffect(() => {
     getTransactions();
-  }, [transactions]);
+  }, []);
   return (
     <div
       style={{
