@@ -1,6 +1,5 @@
 import { ButtonStrip, Center, CircularLoader, Layer } from "@dhis2/ui";
 import React, { useEffect, useState } from "react";
-import Header from "../widgets/header.widget";
 import InitiateTransaction from "./pages/initiateTransaction";
 import { useDataEngine } from "@dhis2/app-runtime";
 import Home from "./pages/Home/home";
@@ -34,7 +33,6 @@ function Index(props) {
   return (
     <div>
       <NavigationBar />
-      {/* <Header page={page} setPage={setPage} styles={props?.styles} /> */}
       {loading ? (
         <Layer translucent>
           <Center>
