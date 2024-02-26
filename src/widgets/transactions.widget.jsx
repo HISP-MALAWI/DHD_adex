@@ -63,7 +63,7 @@ export default function Transactions({ styles }) {
         </Layer>
       )}
       {!loading && transactions?.length > 0 ? (
-        <DataTable scrollHeight="400px">
+        <DataTable >
           <TableHead>
             <DataTableRow>
               <DataTableColumnHeader fixed top="0">
