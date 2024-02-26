@@ -5,8 +5,11 @@ import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
 import { useParams } from "react-router-dom/dist";
 import { StringParam, useQueryParams } from "use-query-params";
+import axios from "axios";
 
 export default function TransactionPreview(props) {
+  const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
+  const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q"; 
   const location = useLocation()
   const [loading, setLoading] = useState(true);
   const engine = useDataEngine();
@@ -38,6 +41,45 @@ export default function TransactionPreview(props) {
       console.log(e);
     }
   };
+
+  const submit = async() => {
+    setLoading(true)
+    const id = location.search.split('=')[1]
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    await axios.post(endpoint,
+      JSON.stringify({
+        id: transactions.id,
+        user_id: transactions?.user_id,
+        analytics: {
+          metadata: transactions?.analytics?.metaData?.items,
+          rows: transactions?.analytics?.rows,
+        },
+        date: new Date().toDateString(),
+        name: transactions.name,
+        description: transactions?.description,
+      }),
+      { headers }).then(async res => {
+        const myMutation ={ ... transactions,status : "success"}
+        const myQuery = {
+            resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${id}`,
+            type : 'update',
+            data : myMutation
+          }
+         await engine.mutate(myQuery).then(res => {
+          getTransactions(id)
+        }).catch(e => {
+          console.log(e)
+        })
+        }).catch(e => {
+          setLoading(false)
+          console.log(e)
+        })
+  }
+  
   useEffect(() => {
     getTransactions(location.search.split('=')[1]);    
   }, []);
@@ -107,7 +149,7 @@ export default function TransactionPreview(props) {
       </div>
       <div style={{padding : '10px'}}>
       <ButtonStrip end>
-      {transactions?.status === 'draft' && <Button primary onclick={()=> console.log(transactions)}>
+      {transactions?.status === 'draft' && <Button primary onClick={()=> submit()}>
           Submit
         </Button>}
       </ButtonStrip>
