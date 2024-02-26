@@ -169,7 +169,7 @@ function InitiateTransaction(props) {
           "Failled to submit data to datastore please try again some time"
         );
         setHidden(false);
-        pushToDataStore("failled");
+        pushToDataStore("failed");
       });
   };
 
