@@ -14,7 +14,11 @@ export default function TransactionPreview(props) {
   const [loading, setLoading] = useState(true);
   const engine = useDataEngine();
   const [transactions, setTransactions] = useState({});
-
+  const [error,setError] = useState(true)
+  const [hide, setHidden] = useState(true);
+  const [message, setMessage] = useState(
+    "Failled to submit payload to Globalfund"
+  );
   //   query params
   // const{id}=useParams();
   const [transactionIdQuery, setTransactionIdQuery] = useQueryParams({
@@ -70,13 +74,20 @@ export default function TransactionPreview(props) {
             data : myMutation
           }
          await engine.mutate(myQuery).then(res => {
+          setError(false)
+          setMessage("Payload sucessifuly submited to Global fund")
+          setHidden(false)
           getTransactions(id)
         }).catch(e => {
-          console.log(e)
+          setLoading(false)
+          setError(true)
+          setHidden(false)
         })
         }).catch(e => {
           setLoading(false)
-          console.log(e)
+          setLoading(false)
+          setError(true)
+          setHidden(false)
         })
   }
   
