@@ -118,14 +118,14 @@ export default function Transactions({ styles }) {
                     </DataTableCell>
                     <DataTableCell>
                       <Link
-                        className={`${styles.statusBg}`}
-                        style={{ textDecoration: "none" }}
                         to={{
                           pathname: "/transaction",
                           search: `id=${transaction?.key}`,
                         }}
                       >
-                        View
+                        <Button toggled>
+                          View
+                        </Button>
                       </Link>
                     </DataTableCell>
                   </DataTableRow>
