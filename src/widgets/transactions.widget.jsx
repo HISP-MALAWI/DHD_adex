@@ -85,7 +85,7 @@ export default function Transactions({ styles }) {
           </TableHead>
           <TableBody>
             {transactions &&
-              transactions?.map((transaction, key) => {
+              transactions?.reverse()?.map((transaction, key) => {  
                 return (
                   <DataTableRow key={key}>
                     <DataTableCell>{transaction?.value?.id}</DataTableCell>
