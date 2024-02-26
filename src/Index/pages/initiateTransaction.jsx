@@ -60,7 +60,6 @@ function InitiateTransaction(props) {
   const fetchData = async () => {
     setLoading(true)
     await engine.query(myQuery).then(res => {
-        console.log(res)
         setElementGroupe(res?.dataElementGroups?.dataElementGroups[0])
         setOU(res?.organisationUnits?.organisationUnits[0])
         setLoading(false)
@@ -204,6 +203,8 @@ function InitiateTransaction(props) {
 
   useEffect(()=>{
     if(analytics?.rows.length > 0){
+        setMessage('No data values found')
+        setHidden(false)
         setDisabled(false)
     }
   },[analytics])
