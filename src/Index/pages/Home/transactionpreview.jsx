@@ -1,4 +1,4 @@
-import { Box, Card, NoticeBox, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip, Layer, Center, CircularLoader } from "@dhis2/ui";
+import { Box, Card, NoticeBox,AlertBar, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip, Layer, Center, CircularLoader } from "@dhis2/ui";
 import { Link, useLocation} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
