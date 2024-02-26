@@ -15,7 +15,7 @@ import Preview from "../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
 import GetAnalytics from "../../Services/data/store/analytics";
 import Noticebox from "../../widgets/noticeBox.widget";
-import { Link } from "react-router-dom";
+import { Link, Navigate, Route, Router, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const myQuery ={
@@ -38,6 +38,7 @@ const myQuery ={
 }
 
 function InitiateTransaction(props) {
+  const navigate = useNavigate()
   const engine = useDataEngine();
   const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
@@ -93,6 +94,7 @@ function InitiateTransaction(props) {
 
   //pushing the to dataStore
   const pushToDataStore = async (trigger) => {
+    
     let state =
       trigger === "draft"
         ? "draft"
@@ -121,7 +123,7 @@ function InitiateTransaction(props) {
           setError(false);
           setMessage("Transaction successifuly saved to Datastore");
           setHidden(false);
-          setTimeout(() => props?.setPage("index"), 3000);
+          setTimeout(() => navigate('/'), 3000);
         }
       })
       .catch((e) => {
@@ -184,7 +186,8 @@ function InitiateTransaction(props) {
       setMessage("Transaction Description is required");
       setHidden(false);
     } else {
-      if (trigger === "Draft") {
+      if (trigger === "draft") {
+        console.log(trigger)
         pushToDataStore(trigger);
       } else {
         //pushing data to Snowflake
@@ -340,7 +343,8 @@ function InitiateTransaction(props) {
             warning={error}
             success={!error}
             hidden={hide}
-            onHidden={() => setHidden(true)}
+            onHidden={() => {
+              setHidden(true)}}
             duration={2000}
           >
             {message}
