@@ -154,6 +154,25 @@ export default function TransactionPreview(props) {
         </Button>}
       </ButtonStrip>
       </div>
+      <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            left: "40%",
+          }}
+        >
+          <AlertBar
+            warning={error}
+            success={!error}
+            hidden={hide}
+            onHidden={() => {
+              setHidden(true)}}
+            duration={2000}
+          >
+            {message}
+          </AlertBar>
+        </div>
     </div>
   );
 }
