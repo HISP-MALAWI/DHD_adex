@@ -1,7 +1,8 @@
 {
   "name": "OpenLMIS-Snowflakes-Intergration",
   "version": "1.0.0",
-  "description": "",
+  "author": "Hisp Unima",
+  "description": "This application was developed by hisp unima to facilitate the transfer of OPENLMIS Data from the HMIS to Global funds snowflakes repository throught the interoperability layer.",
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
