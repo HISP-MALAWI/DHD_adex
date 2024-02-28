@@ -1,7 +1,8 @@
 {
-  "name": "dhd_Adex",
+  "name": "openlmis-snowflakes-intergration",
   "version": "1.0.0",
-  "description": "",
+  "author": "HISP UNIMA",
+  "description": "This application was developed by HISP UNIMA to facilitate the transfer of OPENLMIS Data from the HMIS to Global Fund Snowflakes repository throught the Interoperability Layer.",
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
@@ -15,7 +16,6 @@
   },
   "dependencies": {
     "@dhis2/app-runtime": "^3.10.2",
-    "@dhis2/ui": "^9.4.0",
     "axios": "^1.6.7",
     "lodash": "^4.17.21",
     "react-router-dom": "^6.22.1",

@@ -24,22 +24,7 @@ const query = {
       fields: ["*"],
     },
   },
-  dataElementGroups: {
-    resource: "dataElementGroups",
-    params: {
-      paging: false,
-      filter: "name:eq:A_OpenLMIS ADEx",
-      fields: ["id,name,dataElements(id,name,code,displayShortName)"],
-    },
-  },
-  organisationUnits: {
-    resource: "organisationUnits",
-    params: {
-      paging: false,
-      filter: "name:eq:MOH MALAWI Govt",
-      fields: ["id,name,level,path,displayName,code"],
-    },
-  },
+  
 };
 
 const MyApp = ({ router: Router }) => (

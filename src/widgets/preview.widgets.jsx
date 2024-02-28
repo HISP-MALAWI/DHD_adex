@@ -18,9 +18,7 @@ import Noticebox from "./noticeBox.widget";
 export default function Preview(props) {
   const [analytics, setAnalytics] = useState([]);
   const [vs, setVs] = useState([]);
-  let rws = props?.analytics?.rows?.length;
-  let peArr = [];
-
+  
   const prepareAnalytics = (analytics) => {
     const rows = analytics?.rows;
     const periods = Object.values(analytics?.metaData?.items).filter(

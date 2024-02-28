@@ -47,7 +47,6 @@ export default function Transactions({ styles }) {
         }
       }
     } catch (e) {
-      console.log(e);
     }
   };
   useEffect(() => {
@@ -64,7 +63,7 @@ export default function Transactions({ styles }) {
         </Layer>
       )}
       {!loading && transactions?.length > 0 ? (
-        <DataTable scrollHeight="400px">
+        <DataTable >
           <TableHead>
             <DataTableRow>
               <DataTableColumnHeader fixed top="0">
@@ -86,7 +85,7 @@ export default function Transactions({ styles }) {
           </TableHead>
           <TableBody>
             {transactions &&
-              transactions?.map((transaction, key) => {
+              transactions?.reverse()?.map((transaction, key) => {  
                 return (
                   <DataTableRow key={key}>
                     <DataTableCell>{transaction?.value?.id}</DataTableCell>
@@ -119,14 +118,14 @@ export default function Transactions({ styles }) {
                     </DataTableCell>
                     <DataTableCell>
                       <Link
-                        className={`${styles.statusBg}`}
-                        style={{ textDecoration: "none" }}
                         to={{
                           pathname: "/transaction",
-                          search: `id=${transaction?.value?.id}`,
+                          search: `id=${transaction?.key}`,
                         }}
                       >
-                        View
+                        <Button toggled>
+                          View
+                        </Button>
                       </Link>
                     </DataTableCell>
                   </DataTableRow>

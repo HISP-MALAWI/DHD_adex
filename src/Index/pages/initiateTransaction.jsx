@@ -15,15 +15,35 @@ import Preview from "../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
 import GetAnalytics from "../../Services/data/store/analytics";
 import Noticebox from "../../widgets/noticeBox.widget";
-import { Link } from "react-router-dom";
+import { Link, Navigate, Route, Router, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const myQuery ={
+    dataElementGroups: {
+        resource: "dataElementGroups",
+        params: {
+          paging: false,
+          filter: "name:eq:A_OpenLMIS ADEx",
+          fields: ["id,name,dataElements(id,name,code,displayShortName)"],
+        },
+      },
+      organisationUnits: {
+        resource: "organisationUnits",
+        params: {
+          paging: false,
+          filter: "name:eq:MOH MALAWI Govt",
+          fields: ["id,name,level,path,displayName,code"],
+        },
+      },
+}
+
 function InitiateTransaction(props) {
+  const navigate = useNavigate()
   const engine = useDataEngine();
   const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
-  const dataElementGroup = props?.data?.dataElementGroups?.dataElementGroups;
-  const orgUnit = props?.data?.organisationUnits?.organisationUnits[0];
+  const [dataElementGroup, setElementGroupe] = useState([])
+  const [orgUnit,setOU] = useState([])
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
@@ -36,10 +56,24 @@ function InitiateTransaction(props) {
   const [transDesc, setDesc] = useState();
   const [analytics, setAnalytics] = useState();
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
+  const [disabled, setDisabled] = useState(true)
+
+  const fetchData = async () => {
+    setLoading(true)
+    await engine.query(myQuery).then(res => {
+        setElementGroupe(res?.dataElementGroups?.dataElementGroups[0])
+        setOU(res?.organisationUnits?.organisationUnits[0])
+        setLoading(false)
+    }).catch(error => {
+        setLoading(false)
+        setHidden(false)
+        setMessage(error)
+    })
+  }
 
   const fetchAnalytics = async () => {
-    const dataElements = dataElementGroup[0].dataElements;
-    if (dataElements.length > 0) {
+    const dataElements = dataElementGroup.dataElements;
+    if (dataElements?.length > 0) {
       setLoading(true);
       let dataElementID = [];
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
@@ -60,6 +94,7 @@ function InitiateTransaction(props) {
 
   //pushing the to dataStore
   const pushToDataStore = async (trigger) => {
+    
     let state =
       trigger === "draft"
         ? "draft"
@@ -88,7 +123,7 @@ function InitiateTransaction(props) {
           setError(false);
           setMessage("Transaction successifuly saved to Datastore");
           setHidden(false);
-          setTimeout(() => props?.setPage("index"), 3000);
+          setTimeout(() => navigate('/'), 3000);
         }
       })
       .catch((e) => {
@@ -134,24 +169,25 @@ function InitiateTransaction(props) {
           "Failled to submit data to datastore please try again some time"
         );
         setHidden(false);
-        pushToDataStore("failled");
+        pushToDataStore("failed");
       });
   };
 
   const submit = async (trigger) => {
     setLoading(true);
     if (transName === undefined || transName.length === 0) {
-      setLoading(true);
+      setLoading(false);
       setNameError(true);
       setMessage("Transaction name is required");
       setHidden(false);
     } else if (transDesc === undefined || transDesc.length === 0) {
-      setLoading(true);
+      setLoading(false);
       setDescError(true);
       setMessage("Transaction Description is required");
       setHidden(false);
     } else {
-      if (trigger === "Draft") {
+      if (trigger === "draft") {
+        console.log(trigger)
         pushToDataStore(trigger);
       } else {
         //pushing data to Snowflake
@@ -160,9 +196,21 @@ function InitiateTransaction(props) {
     }
   };
 
+  useEffect(()=>{
+      fetchData()
+  },[])
+
   useEffect(() => {
     fetchAnalytics();
-  }, [periods]);
+  }, [periods,dataElementGroup,orgUnit]);
+
+  useEffect(()=>{
+    if(analytics?.rows.length > 0){
+        setMessage('No data values found')
+        setHidden(false)
+        setDisabled(false)
+    }
+  },[analytics])
   return (
     <div>
       {loading && (
@@ -192,6 +240,9 @@ function InitiateTransaction(props) {
               Back
             </Link>
           </Button>
+          <div>
+            Initiate Transaction
+          </div>
           <ButtonStrip end>
             <EditModal periods={periods} setPeriod={setPeriod} />
           </ButtonStrip>
@@ -272,14 +323,10 @@ function InitiateTransaction(props) {
           }}
         >
           <ButtonStrip end>
-            <Button destructive onClick={() => props?.setPage("index")}>
-              Cancel
-            </Button>
-
-            <Button secondary onClick={() => submit("draft")}>
+            <Button secondary disabled={disabled} onClick={() => submit("draft")}>
               Save as Draft
             </Button>
-            <Button primary onClick={() => submit("success")}>
+            <Button primary disabled={disabled} onClick={() => submit("success")}>
               Submit
             </Button>
           </ButtonStrip>
@@ -296,7 +343,8 @@ function InitiateTransaction(props) {
             warning={error}
             success={!error}
             hidden={hide}
-            onHidden={() => setHidden(true)}
+            onHidden={() => {
+              setHidden(true)}}
             duration={2000}
           >
             {message}
