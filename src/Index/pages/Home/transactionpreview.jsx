@@ -3,6 +3,7 @@ import { Link, useLocation} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
+import { useParams } from "react-router-dom/dist";
 import { StringParam, useQueryParams } from "use-query-params";
 import axios from "axios";
 
@@ -22,8 +23,7 @@ export default function TransactionPreview(props) {
   // const{id}=useParams();
   const [transactionIdQuery, setTransactionIdQuery] = useQueryParams({
     id: StringParam,
-  }); 
-  
+  });
   const { id } = transactionIdQuery;
   //  saved transactions from datastore
   const getTransactions = async (key) => {
@@ -92,63 +92,98 @@ export default function TransactionPreview(props) {
   }
   
   useEffect(() => {
-    getTransactions();
-    console.log(
-      transactions.filter((transaction) => transaction?.value?.id == id)[0]
-    );
-  }, [transactions]);
-
+    getTransactions(location.search.split('=')[1]);    
+  }, []);
   return (
     <div>
-      <div style={{width: "100", backgroundColor: "#f1f2f5", padding: 10}}>
-        <Button small primary>
-          <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>Back</Link>
+      {loading && <Layer translucent>
+        <Center>
+          <CircularLoader /></Center></Layer>}
+      <div style={{width: "100", display:'flex',justifyContent:'space-between', padding: 10}}>
+      <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>
+        <Button secondary>
+          Back
         </Button>
+        </Link>
+        <div>
+          Transaction preview
+        </div>
+        <div className={props?.styles?.hide}></div>
       </div>
       <div
         className=""
         style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: 10, flexWrap: "wrap", justifyContent: "center", gap: 10 }}
       >
-        <div>
-          <NoticeBox title="Transaction Identification">
-           {id}
-          </NoticeBox>
-        </div>
-        <div className="">
-          <NoticeBox title="Description">
-            {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.description}
-          </NoticeBox>
-        </div>
-        <div className="">
-          <NoticeBox title="Creadted By:">
-            {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.user_id.name}
-          </NoticeBox>
-        </div>
-        <div className="">
-          <NoticeBox title="Status Summary:">
-             {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.status}
-          </NoticeBox>
-        </div>
+        <StackedTable>
+          <StackedTableHead>
+            <StackedTableRowHead>
+              <StackedTableCellHead>
+                Id
+              </StackedTableCellHead>
+              <StackedTableCellHead>
+                Name
+              </StackedTableCellHead>
+              <StackedTableCellHead>
+                Description
+              </StackedTableCellHead>
+              <StackedTableCellHead>
+                Status
+              </StackedTableCellHead>
+            </StackedTableRowHead>
+          </StackedTableHead>
+          <StackedTableBody>
+            <StackedTableRow>
+              <StackedTableCell>
+                {transactions?.id}
+              </StackedTableCell>
+              <StackedTableCell>
+                {transactions?.name}
+              </StackedTableCell>
+              <StackedTableCell>
+                {transactions?.description}
+              </StackedTableCell>
+              <StackedTableCell>
+                {transactions?.status}
+              </StackedTableCell>
+            </StackedTableRow>
+          </StackedTableBody>
+        </StackedTable>
       </div>
       <div className="">
-        {transactions.filter(
-          (transaction) => transaction?.value?.id == id
-        )[0] == null ||
-          (transactions.filter(
-            (transaction) => transaction?.value?.id == id
-          )[0] == undefined ? (
-            <spa></spa>
-          ) : (
-            <Preview
-              analytics={
-                transactions.filter(
-                  (transaction) => transaction?.value?.id == id
-                )[0]?.value?.analytics
+        {transactions?.analytics !== undefined && 
+         <Preview
+              analytics={transactions?.analytics
               }
               styles={props.styles}
             />
-          ))}
+}
       </div>
+      <div style={{padding : '10px'}}>
+      <ButtonStrip end>
+      {transactions?.status === 'draft' && <Button primary onClick={()=> submit()}>
+          Submit
+        </Button>}
+      </ButtonStrip>
+      </div>
+      <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            left: "40%",
+          }}
+        >
+          <AlertBar
+            warning={error}
+            success={!error}
+            hidden={hide}
+            onHidden={() => {
+              setHidden(true)}}
+            duration={2000}
+          >
+            {message}
+          </AlertBar>
+        </div>
     </div>
   );
 }
