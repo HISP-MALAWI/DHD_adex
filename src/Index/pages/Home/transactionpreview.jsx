@@ -1,9 +1,8 @@
-import { Box, Card, NoticeBox, Button } from "@dhis2/ui";
+import { Box, CircularLoader,Center,Layer, NoticeBox, Button } from "@dhis2/ui";
 import { Link} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
-import { useParams } from "react-router-dom/dist";
 import { StringParam, useQueryParams } from "use-query-params";
 
 export default function TransactionPreview(props) {
@@ -11,11 +10,10 @@ export default function TransactionPreview(props) {
   const engine = useDataEngine();
   const [transactions, setTransactions] = useState([]);
 
-  //   query params
-  // const{id}=useParams();
   const [transactionIdQuery, setTransactionIdQuery] = useQueryParams({
     id: StringParam,
-  });
+  }); 
+  
   const { id } = transactionIdQuery;
   //  saved transactions from datastore
   const getTransactions = async () => {
@@ -47,61 +45,71 @@ export default function TransactionPreview(props) {
   useEffect(() => {
     getTransactions();
     console.log(
-      transactions.filter((transaction) => transaction?.value?.id == id)[0]
+      transactions.filter((transaction) => transaction?.value?.id == id)
     );
   }, [transactions]);
 
   return (
     <div>
-      <div style={{width: "100", backgroundColor: "#f1f2f5", padding: 10}}>
-        <Button small primary>
-          <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>Back</Link>
-        </Button>
-      </div>
-      <div
-        className=""
-        style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: 10, flexWrap: "wrap", justifyContent: "center", gap: 10 }}
-      >
-        <div>
-          <NoticeBox title="Transaction Identification">
-           {id}
-          </NoticeBox>
+      {loading ? (
+        <Layer translucent>
+          <Center>
+            <CircularLoader />
+          </Center>
+        </Layer>
+      ) : (
+      <>
+        <div style={{width: "100", backgroundColor: "#f1f2f5", padding: 10}}>
+          <Button small primary>
+            <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>Back</Link>
+          </Button>
+        </div>
+        <div
+          className=""
+          style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: 10, flexWrap: "wrap", justifyContent: "center", gap: 10 }}
+        >
+          <div>
+            <NoticeBox title="Transaction Identification">
+            {id}
+            </NoticeBox>
+          </div>
+          <div className="">
+            <NoticeBox title="Description">
+              {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.description}
+            </NoticeBox>
+          </div>
+          <div className="">
+            <NoticeBox title="Creadted By:">
+              {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.user_id.name}
+            </NoticeBox>
+          </div>
+          <div className="">
+            <NoticeBox title="Status Summary:">
+              {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.status}
+            </NoticeBox>
+          </div>
         </div>
         <div className="">
-          <NoticeBox title="Description">
-            {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.description}
-          </NoticeBox>
-        </div>
-        <div className="">
-          <NoticeBox title="Creadted By:">
-            {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.user_id.name}
-          </NoticeBox>
-        </div>
-        <div className="">
-          <NoticeBox title="Status Summary:">
-             {transactions?.filter((transaction) => transaction?.value?.id == id)[0]?.value.status}
-          </NoticeBox>
-        </div>
-      </div>
-      <div className="">
-        {transactions.filter(
-          (transaction) => transaction?.value?.id == id
-        )[0] == null ||
-          (transactions.filter(
+          {transactions.filter(
             (transaction) => transaction?.value?.id == id
-          )[0] == undefined ? (
-            <spa></spa>
-          ) : (
-            <Preview
-              analytics={
-                transactions.filter(
-                  (transaction) => transaction?.value?.id == id
-                )[0]?.value?.analytics
-              }
-              styles={props.styles}
-            />
-          ))}
-      </div>
-    </div>
+          )[0] == null ||
+            (transactions.filter(
+              (transaction) => transaction?.value?.id == id
+            )[0] == undefined ? (
+              <spa></spa>
+            ) : (
+              <Preview
+                analytics={
+                  transactions.filter(
+                    (transaction) => transaction?.value?.id == id
+                  )[0]?.value?.analytics
+                }
+                styles={props.styles}
+              />
+            ))}
+        </div>
+      </>
+    )}
+  </div>
   );
 }
