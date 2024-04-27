@@ -36,6 +36,16 @@ const myQuery = {
       fields: ["id,name,level,path,displayName,code"],
     },
   },
+  organisationUnitGroups: {
+    resource: "organisationUnitGroups",
+    params: {
+      paging: false,
+      filter: "code:eq:GlobalFundOpenLMISADEx",
+      fields: [
+        "id,name,displayName,code,organisationUnits(id,name,displayName,code)",
+      ],
+    },
+  },
 };
 
 function InitiateTransaction(props) {
@@ -45,6 +55,8 @@ function InitiateTransaction(props) {
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
   const [dataElementGroup, setElementGroupe] = useState([]);
   const [orgUnit, setOU] = useState([]);
+  const [orgUnits, setOrgUnits] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
@@ -66,6 +78,8 @@ function InitiateTransaction(props) {
       .then((res) => {
         setElementGroupe(res?.dataElementGroups?.dataElementGroups[0]);
         setOU(res?.organisationUnits?.organisationUnits[0]);
+        setOrgUnits(res?.organisationUnitsGroups?.organisationUnitsGroups[0]);
+
         setLoading(false);
       })
       .catch((error) => {
@@ -77,11 +91,22 @@ function InitiateTransaction(props) {
 
   const fetchAnalytics = async () => {
     const dataElements = dataElementGroup.dataElements;
-    if (dataElements?.length > 0) {
+    const organisationUnits = orgUnits?.organisationUnits;
+
+    if (dataElements?.length > 0 && organisationUnits?.length > 0) {
       setLoading(true);
       let dataElementID = [];
+      let orgUnitsIdList = [];
+
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
-      GetAnalytics.analytics(engine, dataElementID, periods, orgUnit.id)
+      organisationUnits.map((org) => orgUnitsIdList.push(org?.id));
+      GetAnalytics.analytics(
+        engine,
+        dataElementID,
+        periods,
+        orgUnit.id,
+        orgUnitsIdList
+      )
         .then((res) => {
           setAnalytics(res.analytics);
           setLoading(false);
@@ -113,7 +138,6 @@ function InitiateTransaction(props) {
       description: transDesc,
       status: state,
     };
-    console.log(Object);
     const myMutation = {
       resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
       type: "create",
@@ -245,7 +269,7 @@ function InitiateTransaction(props) {
           </Button>
           <div style={{ fontSize: 26 }}>
             <Card>
-              <span style={{ padding: 10}}>Initiate Transaction</span>
+              <span style={{ padding: 10 }}>Initiate Transaction</span>
             </Card>
           </div>
         </div>

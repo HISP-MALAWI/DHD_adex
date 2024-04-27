@@ -14,7 +14,7 @@ import { useDataEngine } from "@dhis2/app-runtime";
 import _, { values } from "lodash";
 import DataElementGroups from "../Services/data/store/dataElementGroups";
 import Noticebox from "./noticeBox.widget";
-import OrganisationUnitGroups from "../Services/data/store/orgUnitsGroup";
+// import OrganisationUnitGroups from "../Services/data/store/orgUnitsGroup";
 
 export default function Preview(props) {
   const [analytics, setAnalytics] = useState([]);
@@ -51,7 +51,29 @@ export default function Preview(props) {
     });
     setAnalytics(values);
   };
-
+  const handleAnalytics = () => {
+    let facilities = [];
+    let values = [];
+    analytics[0]?.dataValues.forEach((analytic) => {
+      return values.push({
+        productCode: analytic?.indicatorCode,
+        reportingPeriod: analytic?.periodValue,
+        productDescription: analytic?.indicatorName,
+        value: analytic?.dataValues,
+      });
+    });
+    // analytics[0]?.dataValues
+    let payloadDesign = {
+      description: "Migration treacable medical logitcal commodities",
+      reportingUnit: "MWI",
+      facilities: [
+        {
+          facilityCode: "LL040122",
+          values: values,
+        },
+      ],
+    };
+  };
   useEffect(() => {
     prepareAnalytics(props?.analytics);
   }, [props]);
