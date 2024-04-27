@@ -14,11 +14,12 @@ import { useDataEngine } from "@dhis2/app-runtime";
 import _, { values } from "lodash";
 import DataElementGroups from "../Services/data/store/dataElementGroups";
 import Noticebox from "./noticeBox.widget";
+import OrganisationUnitGroups from "../Services/data/store/orgUnitsGroup";
 
 export default function Preview(props) {
   const [analytics, setAnalytics] = useState([]);
   const [vs, setVs] = useState([]);
-  
+
   const prepareAnalytics = (analytics) => {
     const rows = analytics?.rows;
     const periods = Object.values(analytics?.metaData?.items).filter(
@@ -43,6 +44,7 @@ export default function Preview(props) {
           indicatorCode: dataElement?.code,
           dataValues: grp[3],
           period: pe?.name,
+          periodValue: pe.code,
         });
       });
       values.push({ period: pe?.name, dataValues: objects });
@@ -62,7 +64,9 @@ export default function Preview(props) {
     });
     setVs(Object.values(grps));
   }, [analytics]);
-
+  useEffect(() => {
+    handleAnalytics();
+  });
   return (
     <div
       style={{
@@ -95,7 +99,7 @@ export default function Preview(props) {
               })}
           </TableRowHead>
           <TableRowHead>
-            <TableCellHead>Dataelement Name</TableCellHead>
+            <TableCellHead>DataElement Name</TableCellHead>
             {props?.analytics &&
               analytics.map((index) => {
                 return (
