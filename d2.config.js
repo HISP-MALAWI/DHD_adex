@@ -5,7 +5,7 @@ const config = {
     },
     icon:"../dhis2-app-icon.png",
     name:"OpenLMIS-Snowflakes-Intergration",
-    author: "Hisp Unima"
+    author: "HISP UNIMA"
 }
 
 module.exports = config

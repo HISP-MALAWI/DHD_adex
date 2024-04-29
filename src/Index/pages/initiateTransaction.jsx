@@ -8,6 +8,7 @@ import {
   Input,
   Layer,
   TextArea,
+  Card,
 } from "@dhis2/ui";
 import React, { useState, useEffect } from "react";
 import EditModal from "../../widgets/editModal.widget";
@@ -18,32 +19,44 @@ import Noticebox from "../../widgets/noticeBox.widget";
 import { Link, Navigate, Route, Router, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const myQuery ={
-    dataElementGroups: {
-        resource: "dataElementGroups",
-        params: {
-          paging: false,
-          filter: "name:eq:A_OpenLMIS ADEx",
-          fields: ["id,name,dataElements(id,name,code,displayShortName)"],
-        },
-      },
-      organisationUnits: {
-        resource: "organisationUnits",
-        params: {
-          paging: false,
-          filter: "name:eq:MOH MALAWI Govt",
-          fields: ["id,name,level,path,displayName,code"],
-        },
-      },
-}
+const myQuery = {
+  dataElementGroups: {
+    resource: "dataElementGroups",
+    params: {
+      paging: false,
+      filter: "name:eq:A_OpenLMIS ADEx",
+      fields: ["id,name,dataElements(id,name,code,displayShortName)"],
+    },
+  },
+  organisationUnits: {
+    resource: "organisationUnits",
+    params: {
+      paging: false,
+      filter: "name:eq:MOH MALAWI Govt",
+      fields: ["id,name,level,path,displayName,code"],
+    },
+  },
+  organisationUnitGroups: {
+    resource: "organisationUnitGroups",
+    params: {
+      paging: false,
+      filter: "code:eq:GlobalFundOpenLMISADEx",
+      fields: [
+        "id,name,displayName,code,organisationUnits(id,name,displayName,code)",
+      ],
+    },
+  },
+};
 
 function InitiateTransaction(props) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const engine = useDataEngine();
   const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
-  const [dataElementGroup, setElementGroupe] = useState([])
-  const [orgUnit,setOU] = useState([])
+  const [dataElementGroup, setElementGroupe] = useState([]);
+  const [orgUnit, setOU] = useState([]);
+  const [orgUnits, setOrgUnits] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
@@ -56,28 +69,44 @@ function InitiateTransaction(props) {
   const [transDesc, setDesc] = useState();
   const [analytics, setAnalytics] = useState();
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
-  const [disabled, setDisabled] = useState(true)
+  const [disabled, setDisabled] = useState(true);
 
   const fetchData = async () => {
-    setLoading(true)
-    await engine.query(myQuery).then(res => {
-        setElementGroupe(res?.dataElementGroups?.dataElementGroups[0])
-        setOU(res?.organisationUnits?.organisationUnits[0])
-        setLoading(false)
-    }).catch(error => {
-        setLoading(false)
-        setHidden(false)
-        setMessage(error)
-    })
-  }
+    setLoading(true);
+    await engine
+      .query(myQuery)
+      .then((res) => {
+        setElementGroupe(res?.dataElementGroups?.dataElementGroups[0]);
+        setOU(res?.organisationUnits?.organisationUnits[0]);
+        setOrgUnits(res?.organisationUnitsGroups?.organisationUnitsGroups[0]);
+
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setHidden(false);
+        setMessage(error);
+      });
+  };
 
   const fetchAnalytics = async () => {
     const dataElements = dataElementGroup.dataElements;
-    if (dataElements?.length > 0) {
+    const organisationUnits = orgUnits?.organisationUnits;
+
+    if (dataElements?.length > 0 && organisationUnits?.length > 0) {
       setLoading(true);
       let dataElementID = [];
+      let orgUnitsIdList = [];
+
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
-      GetAnalytics.analytics(engine, dataElementID, periods, orgUnit.id)
+      organisationUnits.map((org) => orgUnitsIdList.push(org?.id));
+      GetAnalytics.analytics(
+        engine,
+        dataElementID,
+        periods,
+        orgUnit.id,
+        orgUnitsIdList
+      )
         .then((res) => {
           setAnalytics(res.analytics);
           setLoading(false);
@@ -94,7 +123,6 @@ function InitiateTransaction(props) {
 
   //pushing the to dataStore
   const pushToDataStore = async (trigger) => {
-    
     let state =
       trigger === "draft"
         ? "draft"
@@ -110,7 +138,6 @@ function InitiateTransaction(props) {
       description: transDesc,
       status: state,
     };
-    console.log(Object);
     const myMutation = {
       resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
       type: "create",
@@ -123,7 +150,7 @@ function InitiateTransaction(props) {
           setError(false);
           setMessage("Transaction successifuly saved to Datastore");
           setHidden(false);
-          setTimeout(() => navigate('/'), 3000);
+          setTimeout(() => navigate("/"), 3000);
         }
       })
       .catch((e) => {
@@ -187,7 +214,7 @@ function InitiateTransaction(props) {
       setHidden(false);
     } else {
       if (trigger === "draft") {
-        console.log(trigger)
+        console.log(trigger);
         pushToDataStore(trigger);
       } else {
         //pushing data to Snowflake
@@ -196,21 +223,21 @@ function InitiateTransaction(props) {
     }
   };
 
-  useEffect(()=>{
-      fetchData()
-  },[])
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [periods,dataElementGroup,orgUnit]);
+  }, [periods, dataElementGroup, orgUnit]);
 
-  useEffect(()=>{
-    if(analytics?.rows.length > 0){
-        setMessage('No data values found')
-        setHidden(false)
-        setDisabled(false)
+  useEffect(() => {
+    if (analytics?.rows.length > 0) {
+      setMessage("No data values found");
+      setHidden(false);
+      setDisabled(false);
     }
-  },[analytics])
+  }, [analytics]);
   return (
     <div>
       {loading && (
@@ -227,12 +254,12 @@ function InitiateTransaction(props) {
       >
         <div
           style={{
-            padding: 8,
+            padding: 10,
             width: "100%",
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
+            flexDirection: "column",
+            alignItems: "start",
+            gap: 40,
           }}
         >
           <Button basic>
@@ -240,22 +267,20 @@ function InitiateTransaction(props) {
               Back
             </Link>
           </Button>
-          <div>
-            Initiate Transaction
+          <div style={{ fontSize: 26 }}>
+            <Card>
+              <span style={{ padding: 10 }}>Initiate Transaction</span>
+            </Card>
           </div>
-          <ButtonStrip end>
-            <EditModal periods={periods} setPeriod={setPeriod} />
-          </ButtonStrip>
         </div>
         <div
           style={{
-            marginTop: "10px",
-            padding: "20px",
+            padding: 10,
+            marginTop: 20,
           }}
         >
           <div
             style={{
-              padding: "10px",
               width: "50%",
             }}
           >
@@ -272,8 +297,8 @@ function InitiateTransaction(props) {
           </div>
           <div
             style={{
-              padding: "10px",
               width: "50%",
+              marginTop: 10,
             }}
           >
             <Field label="Transaction Description">
@@ -287,10 +312,12 @@ function InitiateTransaction(props) {
               />
             </Field>
           </div>
+          <div style={{ marginTop: 10 }}>
+            <EditModal periods={periods} setPeriod={setPeriod} />
+          </div>
         </div>
         <div
           style={{
-            padding: "10px",
             textAlign: "center",
           }}
         >
@@ -323,10 +350,18 @@ function InitiateTransaction(props) {
           }}
         >
           <ButtonStrip end>
-            <Button secondary disabled={disabled} onClick={() => submit("draft")}>
+            <Button
+              secondary
+              disabled={disabled}
+              onClick={() => submit("draft")}
+            >
               Save as Draft
             </Button>
-            <Button primary disabled={disabled} onClick={() => submit("success")}>
+            <Button
+              primary
+              disabled={disabled}
+              onClick={() => submit("success")}
+            >
               Submit
             </Button>
           </ButtonStrip>
@@ -344,7 +379,8 @@ function InitiateTransaction(props) {
             success={!error}
             hidden={hide}
             onHidden={() => {
-              setHidden(true)}}
+              setHidden(true);
+            }}
             duration={2000}
           >
             {message}
