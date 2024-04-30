@@ -77,7 +77,7 @@ export default function Preview(props) {
         dxPE.push({productCode : dataElement?.code,
                   reportingPeriod: row[2],
                 productDescription: dataElement?.name,
-              values : row[3]})
+              value : row[3]})
       })      
       peCompilitation.push({period : pe?.name,values :dxPE})
      })
@@ -169,22 +169,22 @@ export default function Preview(props) {
                             alignItems : 'center'
                           }}>
                           <div>
-                            {a?.values === null? '-' : a?.values}
+                            {a?.value === null? '-' : a?.value}
                           </div>
                           <div>
-                            {b?.values=== null? '-' : b?.values}
+                            {b?.value=== null? '-' : b?.value}
                           </div>
                           <div>
-                            {c?.values === null? '-' : c?.values}
+                            {c?.value === null? '-' : c?.value}
                           </div>
                           <div>
-                            {d?.values === null? '-' : d?.values}
+                            {d?.value === null? '-' : d?.value}
                           </div>
                           <div>
-                            {ea?.values === null? '-' : ea?.values}
+                            {ea?.value === null? '-' : ea?.value}
                           </div>
                           <div >
-                            {f?.values === null? '-' : f?.values}
+                            {f?.value === null? '-' : f?.value}
                           </div>
                           </div>
                         </DataTableCell>
