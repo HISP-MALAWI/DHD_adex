@@ -42,7 +42,7 @@ const myQuery = {
       paging: false,
       filter: "code:eq:GlobalFundOpenLMISADEx",
       fields: [
-        "id,name,displayName,code,organisationUnits(id,name,displayName,code)",
+        "id,name,code,organisationUnits(id,name,code)",
       ],
     },
   },
@@ -78,8 +78,7 @@ function InitiateTransaction(props) {
       .then((res) => {
         setElementGroupe(res?.dataElementGroups?.dataElementGroups[0]);
         setOU(res?.organisationUnits?.organisationUnits[0]);
-        setOrgUnits(res?.organisationUnitsGroups?.organisationUnitsGroups[0]);
-
+        setOrgUnits(res?.organisationUnitGroups?.organisationUnitGroups[0]);
         setLoading(false);
       })
       .catch((error) => {
@@ -92,20 +91,18 @@ function InitiateTransaction(props) {
   const fetchAnalytics = async () => {
     const dataElements = dataElementGroup.dataElements;
     const organisationUnits = orgUnits?.organisationUnits;
-
+    const groupID = orgUnits.id;
     if (dataElements?.length > 0 && organisationUnits?.length > 0) {
       setLoading(true);
       let dataElementID = [];
       let orgUnitsIdList = [];
 
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
-      organisationUnits.map((org) => orgUnitsIdList.push(org?.id));
       GetAnalytics.analytics(
         engine,
         dataElementID,
         periods,
-        orgUnit.id,
-        orgUnitsIdList
+        groupID
       )
         .then((res) => {
           setAnalytics(res.analytics);
@@ -229,7 +226,8 @@ function InitiateTransaction(props) {
 
   useEffect(() => {
     fetchAnalytics();
-  }, [periods, dataElementGroup, orgUnit]);
+    console.log(orgUnits)
+  }, [periods, dataElementGroup, orgUnit,orgUnits]);
 
   useEffect(() => {
     if (analytics?.rows.length > 0) {
@@ -271,6 +269,9 @@ function InitiateTransaction(props) {
             <Card>
               <span style={{ padding: 10 }}>Initiate Transaction</span>
             </Card>
+          </div>
+          <div>
+            
           </div>
         </div>
         <div
