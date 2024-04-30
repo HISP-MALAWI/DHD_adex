@@ -56,6 +56,7 @@ function InitiateTransaction(props) {
   const [dataElementGroup, setElementGroupe] = useState([]);
   const [orgUnit, setOU] = useState([]);
   const [orgUnits, setOrgUnits] = useState([]);
+  const [payload,setPayload] = useState({})
 
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
@@ -334,6 +335,7 @@ function InitiateTransaction(props) {
             <Preview
               analytics={analytics}
               styles={props?.styles}
+              setPayload={setPayload}
               key={analytics}
             />
           </div>
