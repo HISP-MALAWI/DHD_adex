@@ -86,6 +86,7 @@ export default function Preview(props) {
      DXValues.push({facilityCode : org.code,facilityName:org.name, values:peCompilitation})
     })
     setAnalytics(DXValues);
+    props?.setPayload(DXValues)
   };
 
 
