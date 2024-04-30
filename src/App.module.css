@@ -18,7 +18,10 @@
 }
 
 .border {
-    border-right: 2px solid;
+    border-right: 2px solid;   
+}
+.borderBottom {
+    border-bottom: 2px solid;
 }
 
 .tb {
@@ -26,6 +29,10 @@
     overflow-x: scroll;
 }
 
+
+.width{
+    width : 50px;
+}
 .statusBg {
     background-color: green;
     display: flex;
