@@ -51,13 +51,12 @@ const myQuery = {
 function InitiateTransaction(props) {
   const navigate = useNavigate();
   const engine = useDataEngine();
-  const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
+  const endpoint = "http://3.139.98.58:7000/";
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
   const [dataElementGroup, setElementGroupe] = useState([]);
   const [orgUnit, setOU] = useState([]);
   const [orgUnits, setOrgUnits] = useState([]);
-  const [payload,setPayload] = useState({})
-
+  const [payload,setPayload] = useState()
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
@@ -159,28 +158,33 @@ function InitiateTransaction(props) {
     setLoading(false);
   };
 
+  const transformation = (description) => {
+    let facilities = []
+    payload.map(val => {
+      let facilityCode = val.facilityCode;
+      let values = []
+      val.values.map(v =>{
+        values.push(...v.values)
+      })
+      facilities.push({
+        facilityCode : facilityCode,
+        values: values
+      })
+    })
+    return ( {
+      description: description,
+      reportingUnit : 'MWI',
+      facilities : facilities
+    })
+  }
+
   //this function sends data to Mediator application
   const pushToIL = async () => {
-    const headers = {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
+    const py = transformation(transDesc);
     await axios
       .post(
         endpoint,
-        JSON.stringify({
-          id: `OPEN-${Date.now()}`,
-          user_id: props?.data?.me,
-          analytics: {
-            metadata: analytics.metaData.items,
-            rows: analytics.rows,
-          },
-          date: new Date().toDateString(),
-          name: transName,
-          description: transDesc,
-        }),
-        { headers }
+          transformation(transDesc),
       )
       .then((res) => {
         setError(false);

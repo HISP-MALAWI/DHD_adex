@@ -8,11 +8,12 @@ import { StringParam, useQueryParams } from "use-query-params";
 import axios from "axios";
 
 export default function TransactionPreview(props) {
-  const endpoint = " https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
+  const endpoint = "https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
   const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q"; 
   const location = useLocation()
   const [loading, setLoading] = useState(true);
   const engine = useDataEngine();
+  const [payload,setPayload] = useState()
   const [transactions, setTransactions] = useState({});
   const [error,setError] = useState(true)
   const [hide, setHidden] = useState(true);
@@ -155,6 +156,7 @@ export default function TransactionPreview(props) {
               analytics={transactions?.analytics
               }
               styles={props.styles}
+              setPayload={setPayload}
             />
 }
       </div>
