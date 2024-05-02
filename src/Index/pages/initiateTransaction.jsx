@@ -48,6 +48,150 @@ const myQuery = {
   },
 };
 
+const sample = {
+  "description": "Migration treacable medical logitcal commodities",
+  "reportingUnit": "MWI",
+  "facilities": [
+    {
+      "facilityCode": "XtF7Xzv3edv",
+      "values": [
+        {
+          "productCode": "GF0078",
+          "productDescription": "Acyclovir 200mg, Stock on hand",
+          "value": 11
+        },
+        {
+          "productCode": "GF0088",
+          "reportingPeriod": "202310",
+          "productDescription": "Acyclovir 200mg, tablets Quantity used",
+          "value": 12
+        },
+        {
+          "productCode": "DN002900",
+          "reportingPeriod": "202310",
+          "productDescription": "Acyclovir 200mg, Stock out days",
+          "value": 13
+        },
+        {
+          "productCode": "AA040500",
+          "reportingPeriod": "202310",
+          "productDescription": "Acyclovir 200mg, tablets qty received",
+          "value": 14
+        },
+        {
+          "productCode": "AA039600",
+          "reportingPeriod": "202310",
+          "productDescription": "Acyclovir 200mg, tablets Average Monthly consumption",
+          "value": 15
+        },
+        {
+          "productCode": "AA039900",
+          "reportingPeriod": "202310",
+          "productDescription": " Acyclovir 200mg, tablets Months of stock",
+          "value": 16
+        },
+        {
+          "productCode": "AA040200",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, Stock on hand",
+          "value": 90
+        },
+        {
+          "productCode": "TB042500",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets Quantity used",
+          "value": 91
+        },
+        {
+          "productCode": "TB001300",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, Stock out days",
+          "value": 92
+        },
+        {
+          "productCode": "TB005010",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets qty received",
+          "value": 93
+        }
+      ]
+    },
+    {
+      "facilityCode": "mFfOvxjq4y2",
+      "values": [
+        {
+          "productCode": "TB005010",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, Stock on hand",
+          "value": 100
+        },
+        {
+          "productCode": "TB001300",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets Quantity used",
+          "value": 101
+        },
+        {
+          "productCode": "TB042500",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, Stock out days",
+          "value": 102
+        },
+        {
+          "productCode": "AA040200",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets qty received",
+          "value": 103
+        },
+        {
+          "productCode": "AA039900",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets Average Monthly consumption",
+          "value": 104
+        },
+        {
+          "productCode": "AA039600",
+          "reportingPeriod": "202311",
+          "productDescription": " Acyclovir 200mg, tablets Months of stock",
+          "value": 105
+        },
+        {
+          "productCode": "AA040500",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, Stock on hand",
+          "value": 201
+        },
+        {
+          "productCode": "DN002900",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets Quantity used",
+          "value": 202
+        },
+        {
+          "productCode": "AA000901-c",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, Stock out days",
+          "value": 203
+        },
+        {
+          "productCode": "GF0088",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets qty received",
+          "value": 204
+        },
+        {
+          "productCode": "GF0078",
+          "reportingPeriod": "202311",
+          "productDescription": "Acyclovir 200mg, tablets Average Monthly consumption",
+          "value": 205
+        }
+      
+      ]
+    }
+  ]
+}
+
+
 function InitiateTransaction(props) {
   const navigate = useNavigate();
   const engine = useDataEngine();
@@ -181,10 +325,15 @@ function InitiateTransaction(props) {
   //this function sends data to Mediator application
   const pushToIL = async () => {
     const py = transformation(transDesc);
+    console.log(sample)
+    const headers = {      
+      'Access-Control-Allow-Origin': '*'
+    }
     await axios
       .post(
         endpoint,
-          transformation(transDesc),
+          py,
+          //{headers}
       )
       .then((res) => {
         setError(false);
@@ -260,8 +409,10 @@ function InitiateTransaction(props) {
             padding: 10,
             width: "100%",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
+            alignItems : 'center',
+            justifyContent : 'space-between',
+            flexDirection : 'row',
+
             gap: 40,
           }}
         >
@@ -271,12 +422,11 @@ function InitiateTransaction(props) {
             </Link>
           </Button>
           <div style={{ fontSize: 26 }}>
-            <Card>
               <span style={{ padding: 10 }}>Initiate Transaction</span>
-            </Card>
+            
           </div>
           <div>
-            
+          <EditModal periods={periods} setPeriod={setPeriod} />
           </div>
         </div>
         <div
@@ -319,7 +469,7 @@ function InitiateTransaction(props) {
             </Field>
           </div>
           <div style={{ marginTop: 10 }}>
-            <EditModal periods={periods} setPeriod={setPeriod} />
+            
           </div>
         </div>
         <div
