@@ -83,7 +83,7 @@ export default function Preview(props) {
      })
 
      ouvalue.push(peCompilitation)
-     DXValues.push({facilityCode : org.code,facilityName:org.name, values:peCompilitation})
+     DXValues.push({facilityCode : org.uid,facilityName:org.name, values:peCompilitation})
     })
     setAnalytics(DXValues);
     props?.setPayload(DXValues)
