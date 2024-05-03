@@ -8,7 +8,10 @@ import {
   Input,
   Layer,
   TextArea,
-  Card,
+  Modal,
+  ModalTitle,
+  ModalActions,
+  ModalContent
 } from "@dhis2/ui";
 import React, { useState, useEffect } from "react";
 import EditModal from "../../widgets/editModal.widget";
@@ -48,155 +51,12 @@ const myQuery = {
   },
 };
 
-const sample = {
-  "description": "Migration treacable medical logitcal commodities",
-  "reportingUnit": "MWI",
-  "facilities": [
-    {
-      "facilityCode": "XtF7Xzv3edv",
-      "values": [
-        {
-          "productCode": "GF0078",
-          "productDescription": "Acyclovir 200mg, Stock on hand",
-          "value": 11
-        },
-        {
-          "productCode": "GF0088",
-          "reportingPeriod": "202310",
-          "productDescription": "Acyclovir 200mg, tablets Quantity used",
-          "value": 12
-        },
-        {
-          "productCode": "DN002900",
-          "reportingPeriod": "202310",
-          "productDescription": "Acyclovir 200mg, Stock out days",
-          "value": 13
-        },
-        {
-          "productCode": "AA040500",
-          "reportingPeriod": "202310",
-          "productDescription": "Acyclovir 200mg, tablets qty received",
-          "value": 14
-        },
-        {
-          "productCode": "AA039600",
-          "reportingPeriod": "202310",
-          "productDescription": "Acyclovir 200mg, tablets Average Monthly consumption",
-          "value": 15
-        },
-        {
-          "productCode": "AA039900",
-          "reportingPeriod": "202310",
-          "productDescription": " Acyclovir 200mg, tablets Months of stock",
-          "value": 16
-        },
-        {
-          "productCode": "AA040200",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, Stock on hand",
-          "value": 90
-        },
-        {
-          "productCode": "TB042500",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets Quantity used",
-          "value": 91
-        },
-        {
-          "productCode": "TB001300",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, Stock out days",
-          "value": 92
-        },
-        {
-          "productCode": "TB005010",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets qty received",
-          "value": 93
-        }
-      ]
-    },
-    {
-      "facilityCode": "mFfOvxjq4y2",
-      "values": [
-        {
-          "productCode": "TB005010",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, Stock on hand",
-          "value": 100
-        },
-        {
-          "productCode": "TB001300",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets Quantity used",
-          "value": 101
-        },
-        {
-          "productCode": "TB042500",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, Stock out days",
-          "value": 102
-        },
-        {
-          "productCode": "AA040200",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets qty received",
-          "value": 103
-        },
-        {
-          "productCode": "AA039900",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets Average Monthly consumption",
-          "value": 104
-        },
-        {
-          "productCode": "AA039600",
-          "reportingPeriod": "202311",
-          "productDescription": " Acyclovir 200mg, tablets Months of stock",
-          "value": 105
-        },
-        {
-          "productCode": "AA040500",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, Stock on hand",
-          "value": 201
-        },
-        {
-          "productCode": "DN002900",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets Quantity used",
-          "value": 202
-        },
-        {
-          "productCode": "AA000901-c",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, Stock out days",
-          "value": 203
-        },
-        {
-          "productCode": "GF0088",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets qty received",
-          "value": 204
-        },
-        {
-          "productCode": "GF0078",
-          "reportingPeriod": "202311",
-          "productDescription": "Acyclovir 200mg, tablets Average Monthly consumption",
-          "value": 205
-        }
-      
-      ]
-    }
-  ]
-}
 
 
 function InitiateTransaction(props) {
   const navigate = useNavigate();
   const engine = useDataEngine();
   const endpoint = "http://3.139.98.58:7000/";
-  const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
   const [dataElementGroup, setElementGroupe] = useState([]);
   const [orgUnit, setOU] = useState([]);
   const [orgUnits, setOrgUnits] = useState([]);
@@ -213,6 +73,8 @@ function InitiateTransaction(props) {
   const [transDesc, setDesc] = useState();
   const [analytics, setAnalytics] = useState();
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
+  const [open,setOpen] = useState(false)
+  const [token, setToken] = useState()
   const [disabled, setDisabled] = useState(true);
 
   const fetchData = async () => {
@@ -325,7 +187,6 @@ function InitiateTransaction(props) {
   //this function sends data to Mediator application
   const pushToIL = async () => {
     const py = transformation(transDesc);
-    console.log(sample)
     const headers = {      
       'Access-Control-Allow-Origin': '*'
     }
@@ -392,13 +253,39 @@ function InitiateTransaction(props) {
   }, [analytics]);
   return (
     <div>
-      {loading && (
+    {loading && (
         <Layer translucent>
           <Center>
             <CircularLoader />
           </Center>
         </Layer>
       )}
+
+    {open && <Modal onClose={()=> setOpen(false)}>
+      <ModalTitle>
+        Token
+      </ModalTitle>
+      <ModalContent>
+        <Field label="Token">
+          <Input
+          name="token"
+          onChange={(e)=> setToken(e.value)}/>
+        </Field>
+      </ModalContent>
+      <ModalActions>
+        <ButtonStrip end>
+          <Button onClick={()=> setOpen(false)}>
+            Cancel
+          </Button>
+          <Button primary onClick={() => {
+            setOpen(false)
+            submit("success")}
+          }>
+            Submit
+          </Button>
+        </ButtonStrip>
+      </ModalActions>
+      </Modal>}  
       <div
         style={{
           padding: "20px",
@@ -517,7 +404,7 @@ function InitiateTransaction(props) {
             <Button
               primary
               disabled={disabled}
-              onClick={() => submit("success")}
+              onClick={()=>setOpen(true)}
             >
               Submit
             </Button>
