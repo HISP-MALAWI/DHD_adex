@@ -16,54 +16,24 @@ import {
   CircularLoader,
   NoticeBox,
 } from "@dhis2/ui";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import StatusStyleController from "../Services/data/controllers/statusStyleController";
-import { useDataEngine } from "@dhis2/app-runtime";
 import { Link } from "react-router-dom";
+import TransactionContext from "../context/contexts/TransactionContext";
 export default function Transactions({ styles }) {
-  const [loading, setLoading] = useState(true);
-  const engine = useDataEngine();
-  const [transactions, setTransactions] = useState([]);
-  const getTransactions = async () => {
-    const myQuery = {
-      dataStore: {
-        resource: "dataStore/OpenLMIS_SnowFlake_Intergration",
-        params: {
-          paging: false,
-          fields: ["."],
-        },
-      },
-    };
-    try {
-      const res = await engine.query(myQuery);
-      if (res.dataStore == undefined || res.dataStore == null) {
-        setLoading(true);
-      } else {
-        if (res?.dataStore?.length == 0) {
-          setLoading(false);
-        } else {
-          setLoading(false);
-          setTransactions(res?.dataStore);
-        }
-      }
-    } catch (e) {
-    }
-  };
-  useEffect(() => {
-    getTransactions();
-  }, [transactions]);
+  const { transactions } = useContext(TransactionContext);
 
   return (
     <div>
-      {loading && (
+      {transactions?.length <= 0 && (
         <Layer translucent>
           <Center>
             <CircularLoader />
           </Center>
         </Layer>
       )}
-      {!loading && transactions?.length > 0 ? (
-        <DataTable >
+      {transactions?.length > 0 ? (
+        <DataTable>
           <TableHead>
             <DataTableRow>
               <DataTableColumnHeader fixed top="0">
@@ -78,14 +48,12 @@ export default function Transactions({ styles }) {
               <DataTableColumnHeader fixed top="0">
                 Status
               </DataTableColumnHeader>
-              <DataTableColumnHeader fixed top="0">
-                Action
-              </DataTableColumnHeader>
+              <DataTableColumnHeader fixed top="0"></DataTableColumnHeader>
             </DataTableRow>
           </TableHead>
           <TableBody>
             {transactions &&
-              transactions?.reverse()?.map((transaction, key) => {  
+              transactions?.reverse()?.map((transaction, key) => {
                 return (
                   <DataTableRow key={key}>
                     <DataTableCell>{transaction?.value?.id}</DataTableCell>
@@ -123,7 +91,7 @@ export default function Transactions({ styles }) {
                           search: `id=${transaction?.key}`,
                         }}
                       >
-                        <Button toggled>
+                        <Button secondary small>
                           View
                         </Button>
                       </Link>

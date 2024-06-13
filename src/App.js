@@ -10,11 +10,15 @@ import { HashRouter, Routes, Route, BrowserRouter } from "react-router-dom";
 import { QueryParamProvider } from "use-query-params";
 import InitiateTransaction from "./Index/pages/initiateTransaction";
 import TransactionPreview from "./Index/pages/Home/transactionpreview";
+import TransactionContextProvider from "./context/providers/TransactionContextProvider";
+import ProviderController from "./context/providers/ProviderController";
 const query = {
   me: {
     resource: "me",
     params: {
-      fields: ["id,name,email"],
+      fields: [
+        "id,name,email,userRoles(id,name,displayName),userGroups(id,name,displayName)",
+      ],
     },
   },
   dataStore: {
@@ -24,7 +28,6 @@ const query = {
       fields: ["*"],
     },
   },
-  
 };
 
 const MyApp = ({ router: Router }) => (
@@ -48,27 +51,35 @@ const MyApp = ({ router: Router }) => (
                 adapter={ReactRouter6Adapter}
                 ReactRouterRoute={Route}
               >
-                <Routes>
-                  <Route
-                    path="/"
-                    element={<NavigationBar styles={classes} />}
-                    exact
-                  />
-                  <Route
-                    path="/initiate-transaction"
-                    element={
-                      <InitiateTransaction data={data} styles={classes} />
-                    }
-                    exact
-                  />
-                  <Route
-                    path="/transaction"
-                    element={
-                      <TransactionPreview analytics={data} styles={classes} />
-                    }
-                    exact
-                  />
-                </Routes>
+                <ProviderController>
+                  <Routes>
+                    <Route
+                      path="/"
+                      element={
+                        <NavigationBar styles={classes} user={data?.me} />
+                      }
+                      exact
+                    />
+                    <Route
+                      path="/initiate-transaction"
+                      element={
+                        <InitiateTransaction data={data} styles={classes} />
+                      }
+                      exact
+                    />
+                    <Route
+                      path="/transaction"
+                      element={
+                        <TransactionPreview
+                          user={data?.me}
+                          analytics={data}
+                          styles={classes}
+                        />
+                      }
+                      exact
+                    />
+                  </Routes>
+                </ProviderController>
               </QueryParamProvider>
             </Router>
           </div>
