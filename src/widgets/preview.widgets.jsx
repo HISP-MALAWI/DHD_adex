@@ -95,7 +95,7 @@ export default function Preview(props) {
 
   useEffect(() => {
     // console.log(transactionById);
-    prepareAnalytics(transactionById?.analytics);
+    prepareAnalytics(props?.analytics);
   }, []);
 
   return (

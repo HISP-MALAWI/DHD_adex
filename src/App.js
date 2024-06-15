@@ -12,6 +12,7 @@ import InitiateTransaction from "./Index/pages/initiateTransaction";
 import TransactionPreview from "./Index/pages/Home/transactionpreview";
 import TransactionContextProvider from "./context/providers/TransactionContextProvider";
 import ProviderController from "./context/providers/ProviderController";
+import ConfigurationsPage from "./Index/pages/Home/configurations";
 const query = {
   me: {
     resource: "me",
@@ -75,6 +76,13 @@ const MyApp = ({ router: Router }) => (
                           analytics={data}
                           styles={classes}
                         />
+                      }
+                      exact
+                    />
+                    <Route
+                      path="/configurations"
+                      element={
+                        <ConfigurationsPage user={data?.me} styles={classes} />
                       }
                       exact
                     />

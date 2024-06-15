@@ -28,7 +28,7 @@ export default function NavigationBar(props) {
                   <Button secondary small>
                     <Link
                       to={{
-                        pathname: "initiate-transaction",
+                        pathname: "configurations",
                       }}
                       style={{
                         textDecoration: "none",

@@ -1,10 +1,13 @@
 import React from "react";
 import TransactionContextProvider from "./TransactionContextProvider";
+import IPAddressContextProvider from "./IPAddressContextProvider";
 
 export default function ProviderController({ children }) {
   return (
     <div>
-      <TransactionContextProvider>{children}</TransactionContextProvider>
+      <IPAddressContextProvider>
+        <TransactionContextProvider>{children}</TransactionContextProvider>
+      </IPAddressContextProvider>
     </div>
   );
 }

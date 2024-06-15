@@ -1,7 +1,13 @@
 import {
   Box,
   Card,
-  NoticeBox,
+  Field,
+  TextArea,
+  Modal,
+  ModalTitle,
+  Input,
+  ModalActions,
+  ModalContent,
   AlertBar,
   Button,
   StackedTable,
@@ -20,184 +26,212 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState, useContext } from "react";
 import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
-import { useParams } from "react-router-dom/dist";
-import { StringParam, useQueryParams } from "use-query-params";
 import axios from "axios";
 import DataApproval from "../Approve/DataApproval";
-import TransactionById from "../../../Services/data/store/DataStoreTransactionById";
 import TransactionContext from "../../../context/contexts/TransactionContext";
+import IPAddressContext from "../../../context/contexts/IPAddressContext";
+import useCrypto from "../../../Services/utilities/cryptoJs";
 
+const crypto = new useCrypto();
 export default function TransactionPreview(props) {
   const { transactionById } = useContext(TransactionContext);
   const endpoint = "https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
-  const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
+  // const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
+  const { ipAddress } = useContext(IPAddressContext);
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [openSubmit, setOpenSubmit] = useState(false);
+  const [token, setToken] = useState();
   const engine = useDataEngine();
   const [payload, setPayload] = useState();
-  const [transactions, setTransactions] = useState({});
   const [error, setError] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
     "Failled to submit payload to Globalfund"
   );
   const [openApprove, setOpenApprove] = useState(false);
-  //   query params
-  // const{id}=useParams();
-  // const [transactionIdQuery, setTransactionIdQuery] = useQueryParams({
-  //   id: StringParam,
-  // });
-  // const { id } = transactionIdQuery;
-  //  saved transactions from datastore
-  // const getTransactions = async () => {
-  //   const queryParams = new URLSearchParams(location.search);
-  //   JSON.parse(new URLSearchParams(location.search).get("data"));
-  //   const data = JSON.parse(queryParams.get("data"));
-  //   if (data == undefined || data == null || data == "") {
-  //     setLoading(false);
-  //     setTransactions({});
-  //   } else {
-  //     // console.log(data);
-  //     setLoading(false);
-  //     setTransactions(data?.value);
-  //   }
-  //   console.log(data);
-  // const myQuery = {
-  //   dataStore: {
-  //     resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${key}`,
-  //     params: {
-  //       paging: false,
-  //       fields: ["."],
-  //     },
-  //   },
-  // };
-  // try {
-  //   const res = await engine.query(myQuery);
-  //   setTransactions(res?.dataStore);
-  //   setLoading(false);
-  // } catch (e) {
-  //   setLoading(false);
-  //   console.log(e);
-  // }
-  // };
 
-  const submit = async () => {
-    setLoading(true);
-    const id = location.search.split("=")[1];
-    const headers = {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-    await axios
-      .post(
-        endpoint,
-        JSON.stringify({
-          id: transactions.id,
-          user_id: transactions?.user_id,
-          analytics: {
-            metadata: transactions?.analytics?.metaData?.items,
-            rows: transactions?.analytics?.rows,
-          },
-          date: new Date().toDateString(),
-          name: transactions.name,
-          description: transactions?.description,
-        }),
-        { headers }
-      )
-      .then(async (res) => {
-        const myMutation = { ...transactions, status: "success" };
-        const myQuery = {
-          resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${id}`,
-          type: "update",
-          data: myMutation,
-        };
-        await engine
-          .mutate(myQuery)
-          .then((res) => {
-            setError(false);
-            setMessage("Payload sucessifuly submited to Global fund");
-            setHidden(false);
-            getTransactions(id);
-          })
-          .catch((e) => {
-            setLoading(false);
-            setError(true);
-            setHidden(false);
-          });
-      })
-      .catch((e) => {
-        setLoading(false);
-        setLoading(false);
-        setError(true);
-        setHidden(false);
-      });
-  };
   const approveHandler = async (data) => {
-    const path = `dataStore/OpenLMIS_SnowFlake_Intergration/${
-      transactionById?.id.split("-")[1]
-    }`;
+    if (
+      transactionById?.id != undefined ||
+      transactionById?.id != null ||
+      transactionById?.id != ""
+    ) {
+      const path = `dataStore/OpenLMIS_SnowFlake_Intergration/${
+        transactionById?.id?.split("-")[1]
+      }`;
+      if (data?.status == "fail") {
+        transactionById.approved = false;
+      } else {
+        transactionById.approved = true;
+      }
 
-    if (data?.status == "fail") {
-      transactionById.approved = false;
-    } else {
-      transactionById.approved = true;
+      const dataLayout = {
+        resource: path,
+        type: "update",
+        data: transactionById,
+      };
+      let mm = "";
+      if (data?.comment == "" && data?.status == "success") {
+        mm = "Approved, continue with submission";
+      } else if (data?.comment == "" && data?.status == "fail") {
+        mm = "Approval denied, check the payload values";
+      } else {
+        mm = data?.comment;
+      }
+      const messagePayload = {
+        type: "create",
+        resource: "messageConversations",
+        data: {
+          subject:
+            data.status == "fail"
+              ? "OpenLMIS Payload approval failed"
+              : "OpenLMIS Payload approved",
+          text: mm,
+          userGroups: [
+            {
+              id: props?.user?.userGroups.filter(
+                (userGroup) =>
+                  userGroup.name == "A_OpenLMIS SnowFlakes Approval"
+              )[0].id,
+            },
+          ],
+        },
+      };
+      await engine
+        .mutate(dataLayout)
+        .then((res) => {
+          if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
+            engine
+              .mutate(messagePayload)
+              .then((res) => {
+                if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
+                  console.log(res);
+                }
+              })
+              .catch((e) => {
+                console.log(e);
+              });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     }
+  };
 
-    const dataLayout = {
-      resource: path,
-      type: "update",
-      data: transactionById,
+  const transformation = () => {
+    let facilities = [];
+    payload.map((val) => {
+      let facilityCode = val.facilityCode;
+      let values = [];
+      val.values.map((v) => {
+        values.push(...v.values);
+      });
+      facilities.push({
+        facilityCode: facilityCode,
+        values: values,
+      });
+    });
+    return {
+      description: transactionById?.description,
+      reportingUnit: "MWI",
+      facilities: facilities,
     };
-    let mm = "";
-    if (data?.comment == "" && data?.status == "success") {
-      mm = "Approved, continue with submission";
-    } else if (data?.comment == "" && data?.status == "fail") {
-      mm = "Approval denied, check the payload values";
-    } else {
-      mm = data?.comment;
-    }
-    const messagePayload = {
-      type: "create",
-      resource: "messageConversations",
-      data: {
-        subject:
-          data.status == "fail"
-            ? "OpenLMIS Payload approval failed"
-            : "OpenLMIS Payload approved",
-        text: mm,
-        userGroups: [
-          {
-            id: props?.user?.userGroups.filter(
-              (userGroup) => userGroup.name == "A_OpenLMIS SnowFlakes Approval"
-            )[0].id,
-          },
-        ],
-      },
+  };
+
+  //pushing the to dataStore
+  const pushToDataStore = async (trigger) => {
+    let state =
+      trigger === "draft"
+        ? "draft"
+        : trigger === "success"
+        ? "success"
+        : "failed";
+    // const Object = {
+    //   id: `OPEN-${Date.now()}`,
+    //   user_id: props?.data?.me,
+    //   analytics: analytics,
+    //   name: transName,
+    //   date: new Date().toDateString(),
+    //   description: transactionById?.description,
+    //   status: state,
+    //   approved: false,
+    // };
+    transactionById.status = state;
+    const myMutation = {
+      resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${
+        transactionById.id.split("-")[0]
+      }`,
+      type: "update",
+      data: Object,
     };
     await engine
-      .mutate(dataLayout)
+      .mutate(myMutation)
       .then((res) => {
         if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
-          engine
-            .mutate(messagePayload)
-            .then((res) => {
-              if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
-                console.log(res);
-              }
-            })
-            .catch((e) => {
-              console.log(e);
-            });
+          setError(false);
+          setMessage("Transaction successifuly updated to Datastore");
+          setHidden(false);
+          setTimeout(() => navigate("/"), 3000);
         }
       })
       .catch((e) => {
-        console.log(e);
+        setError(true);
+        setMessage("failed to save transaction to DataStore");
+        setHidden(false);
       });
+    setLoading(false);
   };
-  useEffect(() => {
-    console.log(transactionById);
-  });
+
+  //this function sends data to Mediator application
+  const pushToIL = async () => {
+    // const endpoint = "http://3.139.98.58:7000/";
+    const py = transformation();
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+    };
+    if (
+      ipAddress?.address == undefined ||
+      ipAddress?.address == null ||
+      ipAddress?.address == ""
+    ) {
+      // console.log({ IP: ipAddress });
+    } else {
+      let ip = crypto.decrypt(ipAddress?.address);
+      if (ip == null || ip == undefined || ip == "") {
+        // console.log({ fail: "failed", ip, ipAddress });
+      } else {
+        // console.log({ pass: "pass", ip, ipAddress });
+        // await axios
+        //   .post(
+        //     ip,
+        //     py
+        //     //{headers}
+        //   )
+        //   .then((res) => {
+        //     setError(false);
+        //     setMessage("Data sucessifuly submit to Global fund");
+        //     setHidden(false);
+        //     pushToDataStore("success");
+        //   })
+        //   .catch((e) => {
+        //     setError(true);
+        //     setMessage(
+        //       "Failled to submit data to datastore please try again some time"
+        //     );
+        //     setHidden(false);
+        //     pushToDataStore("failed");
+        //   });
+      }
+    }
+  };
+
+  const submit = async () => {
+    // setLoading(true);
+    pushToIL();
+  };
+
   return (
     <div>
       {!loading && (
@@ -249,6 +283,34 @@ export default function TransactionPreview(props) {
               approveHandler={approveHandler}
             />
           )}
+
+        {openSubmit && (
+          <Modal onClose={() => setOpenSubmit(false)}>
+            <ModalTitle>Destination User Authentication Token</ModalTitle>
+            <ModalContent>
+              <ModalTitle>
+                IP Address: {crypto.decrypt(ipAddress?.address)}
+              </ModalTitle>
+              <Field label="Token">
+                <Input name="token" onChange={(e) => setToken(e.value)} />
+              </Field>
+            </ModalContent>
+            <ModalActions>
+              <ButtonStrip end>
+                <Button onClick={() => setOpenSubmit(false)}>Cancel</Button>
+                <Button
+                  primary
+                  onClick={() => {
+                    setOpenSubmit(false);
+                    submit("success");
+                  }}
+                >
+                  Submit
+                </Button>
+              </ButtonStrip>
+            </ModalActions>
+          </Modal>
+        )}
         <StackedTable>
           <StackedTableHead>
             <StackedTableRowHead>
@@ -256,7 +318,7 @@ export default function TransactionPreview(props) {
               <StackedTableCellHead>Name</StackedTableCellHead>
               <StackedTableCellHead>Description</StackedTableCellHead>
               <StackedTableCellHead>Status</StackedTableCellHead>
-              <StackedTableCellHead>Vaidation</StackedTableCellHead>
+              <StackedTableCellHead>Validation</StackedTableCellHead>
               <StackedTableCellHead>Submit</StackedTableCellHead>
             </StackedTableRowHead>
           </StackedTableHead>
@@ -289,12 +351,12 @@ export default function TransactionPreview(props) {
                     {props?.user?.userRoles.filter(
                       (user) => user.name == "A_OpenLMIS_SF_Admin"
                     )?.length > 0 && transactionById?.approved == true ? (
-                      <Button primary small onClick={() => submit()}>
+                      <Button primary small onClick={() => setOpenSubmit(true)}>
                         Submit
                       </Button>
                     ) : (
                       <Button primary small disabled>
-                        Submit
+                        Not a valid user group or no destination url found
                       </Button>
                     )}
                   </div>

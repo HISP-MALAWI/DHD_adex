@@ -67,7 +67,7 @@ function InitiateTransaction(props) {
   const [descError, setDescError] = useState(false);
   const [transName, setName] = useState();
   const [transDesc, setDesc] = useState();
-  const [analytics, setAnalytics] = useState();
+  const [analytics, setAnalytics] = useState({});
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState();
@@ -102,7 +102,8 @@ function InitiateTransaction(props) {
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
       GetAnalytics.analytics(engine, dataElementID, periods, groupID)
         .then((res) => {
-          setAnalytics(res.analytics);
+          console.log(res);
+          setAnalytics(res?.analytics);
           setLoading(false);
         })
         .catch(() => {
@@ -218,11 +219,10 @@ function InitiateTransaction(props) {
       setHidden(false);
     } else {
       if (trigger === "draft") {
-        console.log(trigger);
         pushToDataStore(trigger);
       } else {
         //pushing data to Snowflake
-        pushToIL();
+        // pushToIL();
       }
     }
   };
@@ -233,11 +233,11 @@ function InitiateTransaction(props) {
 
   useEffect(() => {
     fetchAnalytics();
-    console.log(orgUnits);
+    // console.log(orgUnits);
   }, [periods, dataElementGroup, orgUnit, orgUnits]);
 
   useEffect(() => {
-    if (analytics?.rows.length > 0) {
+    if (analytics?.rows?.length > 0) {
       setMessage("No data values found");
       setHidden(false);
       setDisabled(false);
@@ -284,7 +284,6 @@ function InitiateTransaction(props) {
       >
         <div
           style={{
-            padding: 10,
             width: "100%",
             display: "flex",
             alignItems: "center",
@@ -302,13 +301,9 @@ function InitiateTransaction(props) {
           <div style={{ fontSize: 26 }}>
             <span style={{ padding: 10 }}>Initiate Transaction</span>
           </div>
-          <div>
-            <EditModal periods={periods} setPeriod={setPeriod} />
-          </div>
         </div>
         <div
           style={{
-            padding: 10,
             marginTop: 20,
           }}
         >
@@ -317,6 +312,9 @@ function InitiateTransaction(props) {
               width: "50%",
             }}
           >
+            <div style={{ marginBottom: "30px", marginTop: "30px" }}>
+              <EditModal periods={periods} setPeriod={setPeriod} />
+            </div>
             <Field label="Transaction name">
               <Input
                 name="TransID"
@@ -349,12 +347,12 @@ function InitiateTransaction(props) {
         </div>
         <div
           style={{
-            textAlign: "center",
+            textAlign: "left",
           }}
         >
           <h3>Data Preview</h3>
         </div>
-        {analytics?.rows.length > 0 ? (
+        {analytics?.rows?.length > 0 ? (
           <div
             style={{
               maxWidth: "100%",
@@ -378,20 +376,16 @@ function InitiateTransaction(props) {
         )}
         <div
           style={{
-            padding: "80px",
+            paddingTop: "30px",
           }}
         >
-          <ButtonStrip end>
-            <Button
-              secondary
-              disabled={disabled}
-              onClick={() => submit("draft")}
-            >
+          <ButtonStrip start>
+            <Button primary disabled={disabled} onClick={() => submit("draft")}>
               Save as Draft
             </Button>
-            <Button primary disabled={disabled} onClick={() => setOpen(true)}>
+            {/* <Button primary disabled={disabled} onClick={() => setOpen(true)}>
               Submit
-            </Button>
+            </Button> */}
           </ButtonStrip>
         </div>
         <div
