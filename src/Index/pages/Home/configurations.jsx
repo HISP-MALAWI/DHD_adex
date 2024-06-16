@@ -28,10 +28,8 @@ export default function ConfigurationsPage({ user }) {
   const [message, setMessage] = useState(
     "Failled to submit payload to Globalfund"
   );
-  const IP = Object.keys(ipAddress)?.length > 0 ? crypto.decrypt(ipAddress?.address) : <CircularLoader aria-label
-    ="ExtraSmall  Loader" extrasmall
-  />
-  const updateIpAddress = async ({ user }) => {
+  const IP = Object.keys(ipAddress)?.length > 0 && ipAddress?.address !== "" || ipAddress?.address !== null || ipAddress?.address !== undefined ? crypto.decrypt(ipAddress?.address) : "..."
+  const updateIpAddress = async (userData) => {
     if (
       ipAddressValue == "" ||
       ipAddressValue == undefined ||
@@ -39,7 +37,7 @@ export default function ConfigurationsPage({ user }) {
     ) {
     } else {
       let encryptedId = crypto.encrypt(ipAddressValue);
-      if (ipAddress?.error == true) {
+      if (Object.keys(ipAddress)?.length <= 0) {
         const ipAddressCreatePayload = {
           resource: path,
           type: "create",
@@ -47,8 +45,8 @@ export default function ConfigurationsPage({ user }) {
             address: encryptedId,
             createdAt: new Date().toDateString(),
             updatedAt: new Date().toDateString(),
-            createdby: user,
-            updated: user,
+            createdby: userData,
+            updated: userData,
           },
         };
         await engine
@@ -64,7 +62,7 @@ export default function ConfigurationsPage({ user }) {
 
       } else {
         ipAddress.address = encryptedId
-        ipAddress.updated = user
+        ipAddress.updated = userData
         ipAddress.updatedAt = new Date().toDateString()
         const ipAddressUpdatePayload = {
           resource: path,
@@ -88,9 +86,6 @@ export default function ConfigurationsPage({ user }) {
     }
   };
 
-  useEffect(() => {
-    console.log({ ipAddress, IP });
-  });
   return (
     <div>
 
@@ -113,7 +108,7 @@ export default function ConfigurationsPage({ user }) {
           </div>
         </Card>
       </div>
-      <div className="" style={{ padding: "10px" }}>
+      <div className="" style={{ padding: "10px",width:"600px" }}>
         <Card>
           <div
             style={{
@@ -144,7 +139,7 @@ export default function ConfigurationsPage({ user }) {
                 </div>
                 {
                   (ipAddressValue != "" || ipAddressValue != undefined || ipAddressValue != null) &&
-                  <Button small primary onClick={updateIpAddress}>
+                  <Button small primary onClick={() => updateIpAddress(user)}>
                     Update {loading && <CircularLoader aria-label
                       ="ExtraSmall  Loader" extrasmall
                     />}
