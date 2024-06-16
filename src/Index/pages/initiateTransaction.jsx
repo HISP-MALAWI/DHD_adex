@@ -52,17 +52,15 @@ const myQuery = {
 function InitiateTransaction(props) {
   const navigate = useNavigate();
   const engine = useDataEngine();
-  const endpoint = "http://3.139.98.58:7000/";
+  // const endpoint = "http://3.139.98.58:7000/";
   const [dataElementGroup, setElementGroupe] = useState([]);
   const [orgUnit, setOU] = useState([]);
   const [orgUnits, setOrgUnits] = useState([]);
   const [payload, setPayload] = useState();
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
-  const [message, setMessage] = useState(
-    "No data Elements found in  data element group"
-  );
-  const [error, setError] = useState(true);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [descError, setDescError] = useState(false);
   const [transName, setName] = useState();
@@ -86,7 +84,7 @@ function InitiateTransaction(props) {
       .catch((error) => {
         setLoading(false);
         setHidden(false);
-        setMessage(error);
+        setMessage("No data Elements found in  data element group");
       });
   };
 
@@ -102,7 +100,6 @@ function InitiateTransaction(props) {
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
       GetAnalytics.analytics(engine, dataElementID, periods, groupID)
         .then((res) => {
-          console.log(res);
           setAnalytics(res?.analytics);
           setLoading(false);
         })
@@ -178,32 +175,32 @@ function InitiateTransaction(props) {
   };
 
   //this function sends data to Mediator application
-  const pushToIL = async () => {
-    const py = transformation(transDesc);
-    const headers = {
-      "Access-Control-Allow-Origin": "*",
-    };
-    await axios
-      .post(
-        endpoint,
-        py
-        //{headers}
-      )
-      .then((res) => {
-        setError(false);
-        setMessage("Data sucessifuly submit to Global fund");
-        setHidden(false);
-        pushToDataStore("success");
-      })
-      .catch((e) => {
-        setError(true);
-        setMessage(
-          "Failled to submit data to datastore please try again some time"
-        );
-        setHidden(false);
-        pushToDataStore("failed");
-      });
-  };
+  // const pushToIL = async () => {
+  //   const py = transformation(transDesc);
+  //   const headers = {
+  //     "Access-Control-Allow-Origin": "*",
+  //   };
+  //   await axios
+  //     .post(
+  //       endpoint,
+  //       py
+  //       //{headers}
+  //     )
+  //     .then((res) => {
+  //       setError(false);
+  //       setMessage("Data sucessifuly submit to Global fund");
+  //       setHidden(false);
+  //       pushToDataStore("success");
+  //     })
+  //     .catch((e) => {
+  //       setError(true);
+  //       setMessage(
+  //         "Failled to submit data to datastore please try again some time"
+  //       );
+  //       setHidden(false);
+  //       pushToDataStore("failed");
+  //     });
+  // };
 
   const submit = async (trigger) => {
     setLoading(true);
@@ -396,17 +393,7 @@ function InitiateTransaction(props) {
             left: "40%",
           }}
         >
-          <AlertBar
-            warning={error}
-            success={!error}
-            hidden={hide}
-            onHidden={() => {
-              setHidden(true);
-            }}
-            duration={2000}
-          >
-            {message}
-          </AlertBar>
+         
         </div>
       </div>
     </div>

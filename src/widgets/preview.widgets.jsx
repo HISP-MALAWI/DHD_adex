@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
+  Divider,
   Table,
   TableBody,
   DataTableCell,
@@ -99,124 +100,176 @@ export default function Preview(props) {
   }, []);
 
   return (
-    <DataTable>
-      {analytics?.map((val, index) => {
-        return (
-          <>
-            <TableHead>
-              <DataTableColumnHeader>Organisation Unit</DataTableColumnHeader>
-              <DataTableColumnHeader colSpan="9">
-                {val.facilityName}
-              </DataTableColumnHeader>
-            </TableHead>
-            <TableHead>
-              <DataTableColumnHeader>Periods</DataTableColumnHeader>
-              {val.values.map((pe, index) => {
-                return (
-                  <>
-                    <DataTableColumnHeader>{pe.period}</DataTableColumnHeader>
-                  </>
-                );
-              })}
-            </TableHead>
-            <TableHead>
-              {val.values.map((pe, index) => {
-                return (
-                  <>
-                    {index === 0 && (
-                      <DataTableColumnHeader>
-                        Data Element
+    <div className="" style={{ overflowX: "auto" }}>
+      <DataTable>
+        {analytics?.map((val, index) => {
+          return (
+            <div>
+              <div
+                style={{
+                  backgroundColor: "#0d47a1",
+                  height: "10px",
+                  width: "100%",
+                  margin: "auto",
+                  opacity: "0.8",
+                }}
+              />
+              <TableHead>
+                <DataTableColumnHeader>Organisation Unit</DataTableColumnHeader>
+                <DataTableColumnHeader colSpan="9">
+                  {val.facilityName}
+                </DataTableColumnHeader>
+              </TableHead>
+              <TableHead>
+                <DataTableColumnHeader>Periods</DataTableColumnHeader>
+                {val.values.map((pe, index) => {
+                  return (
+                    <>
+                      <DataTableColumnHeader colSpan="6">
+                        {pe.period}
                       </DataTableColumnHeader>
-                    )}
-                    <DataTableColumnHeader>
-                      {
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignContent: "center",
-                          }}
-                        >
-                          <div key={"Closing Balance"}>
-                            Closing Balance (Stock on Hand)
-                          </div>
-                          <div key={"qty"}>Quantity Used in Period</div>
-                          <div>Months of Stock</div>
-                          <div key={"stk"}>Stock Out Days</div>
-                          <div>Average Stock out Days</div>
-                          <div key={"rc"}>Quantity Received</div>
-                        </div>
-                      }
-                    </DataTableColumnHeader>
-                  </>
-                );
-              })}
-            </TableHead>
-            <TableBody>
-              {dx.map((e) => {
-                return (
-                  <DataTableRow>
-                    <DataTableCell>{e}</DataTableCell>
-                    {val.values.map((vl, index) => {
-                      let a = vl.values.filter(
-                        (a) =>
-                          a.productDescription.includes(e) &&
-                          a.productDescription.includes("Stock on hand")
-                      )[0];
-                      let b = vl.values.filter(
-                        (a) =>
-                          a.productDescription.includes(e) &&
-                          a.productDescription.includes("Quantity used")
-                      )[0];
-                      let c = vl.values.filter(
-                        (a) =>
-                          a.productDescription.includes(e) &&
-                          a.productDescription.includes("Months of stock")
-                      )[0];
-                      let d = vl.values.filter(
-                        (a) =>
-                          a.productDescription.includes(e) &&
-                          a.productDescription.includes("Stock out days")
-                      )[0];
-                      let ea = vl.values.filter(
-                        (a) =>
-                          a.productDescription.includes(e) &&
-                          a.productDescription.includes(
-                            "Average Monthly consumption"
-                          )
-                      )[0];
-                      let f = vl.values.filter(
-                        (a) =>
-                          a.productDescription.includes(e) &&
-                          a.productDescription.includes("quantity received")
-                      )[0];
+                    </>
+                  );
+                })}
+              </TableHead>
+              <TableHead>
+                {val.values.map((pe, index) => {
+                  return (
+                    <>
+                      {index === 0 && (
+                        <DataTableColumnHeader>
+                          <span style={{ fontSize: "12px" }}>Data Element</span>
+                        </DataTableColumnHeader>
+                      )}
+                      <DataTableColumnHeader>
+                        <span style={{ fontSize: "12px" }}>
+                          Closing Balance (Stock on Hand)
+                        </span>
+                      </DataTableColumnHeader>
+                      <DataTableColumnHeader>
+                        <span style={{ fontSize: "12px" }}>
+                          Quantity Used in Period
+                        </span>
+                      </DataTableColumnHeader>
+                      <DataTableColumnHeader>
+                        <span style={{ fontSize: "12px" }}>
+                          Months of Stock
+                        </span>
+                      </DataTableColumnHeader>
+                      <DataTableColumnHeader>
+                        <span style={{ fontSize: "12px" }}>Stock Out Days</span>
+                      </DataTableColumnHeader>
+                      <DataTableColumnHeader>
+                        <span style={{ fontSize: "12px" }}>
+                          Average Stock out Days
+                        </span>
+                      </DataTableColumnHeader>
+                      <DataTableColumnHeader>
+                        <span style={{ fontSize: "12px" }}>
+                          Quantity Received
+                        </span>
+                      </DataTableColumnHeader>
+                    </>
+                  );
+                })}
+              </TableHead>
+              <TableBody>
+                {dx.map((e) => {
+                  return (
+                    <DataTableRow>
+                      <DataTableCell bordered>
+                        <span style={{ fontSize: "12px" }}>{e}</span>
+                      </DataTableCell>
+                      {val.values.map((vl, index) => {
+                        return [
+                          "Stock on hand",
+                          "Quantity used",
+                          "Months of stock",
+                          "Stock out days",
+                          "Average Monthly consumption",
+                          "quantity received",
+                        ].map((dataKey) => {
+                          return vl.values.filter(
+                            (a) =>
+                              a.productDescription.includes(e) &&
+                              a.productDescription.includes(dataKey)
+                          )[0]?.value != null ? (
+                            <DataTableCell bordered>
+                              <span style={{ fontSize: "12px" }}>
+                                {
+                                  vl.values.filter(
+                                    (a) =>
+                                      a.productDescription.includes(e) &&
+                                      a.productDescription.includes(dataKey)
+                                  )[0]?.value
+                                }
+                              </span>
+                            </DataTableCell>
+                          ) : (
+                            <DataTableCell bordered></DataTableCell>
+                          );
+                        });
+                        // let a = vl.values.filter(
+                        //   (a) =>
+                        //     a.productDescription.includes(e) &&
+                        //     a.productDescription.includes("Stock on hand")
+                        // )[0];
+                        // let b = vl.values.filter(
+                        //   (a) =>
+                        //     a.productDescription.includes(e) &&
+                        //     a.productDescription.includes("Quantity used")
+                        // )[0];
+                        // let c = vl.values.filter(
+                        //   (a) =>
+                        //     a.productDescription.includes(e) &&
+                        //     a.productDescription.includes("Months of stock")
+                        // )[0];
+                        // let d = vl.values.filter(
+                        //   (a) =>
+                        //     a.productDescription.includes(e) &&
+                        //     a.productDescription.includes("Stock out days")
+                        // )[0];
+                        // let ea = vl.values.filter(
+                        //   (a) =>
+                        //     a.productDescription.includes(e) &&
+                        //     a.productDescription.includes(
+                        //       "Average Monthly consumption"
+                        //     )
+                        // )[0];
+                        // let f = vl.values.filter(
+                        //   (a) =>
+                        //     a.productDescription.includes(e) &&
+                        //     a.productDescription.includes("quantity received")
+                        // )[0];
 
-                      return (
-                        <DataTableCell bordered>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <div>{a?.value === null ? "-" : a?.value}</div>
-                            <div>{b?.value === null ? "-" : b?.value}</div>
-                            <div>{c?.value === null ? "-" : c?.value}</div>
-                            <div>{d?.value === null ? "-" : d?.value}</div>
-                            <div>{ea?.value === null ? "-" : ea?.value}</div>
-                            <div>{f?.value === null ? "-" : f?.value}</div>
-                          </div>
-                        </DataTableCell>
-                      );
-                    })}
-                  </DataTableRow>
-                );
-              })}
-            </TableBody>
-          </>
-        );
-      })}
-    </DataTable>
+                        // return (
+                        //   <DataTableCell bordered>
+                        //     <div
+                        //       style={{
+                        //         display: "flex",
+                        //         justifyContent: "space-between",
+                        //         alignItems: "center",
+                        //       }}
+                        //     >
+                        //       <div>{a?.value === null ? "-" : a?.value}</div>
+                        //       <div>{b?.value === null ? "-" : b?.value}</div>
+                        //       <div>{c?.value === null ? "-" : c?.value}</div>
+                        //       <div>{d?.value === null ? "-" : d?.value}</div>
+                        //       <div>{ea?.value === null ? "-" : ea?.value}</div>
+                        //       <div>{f?.value === null ? "-" : f?.value}</div>
+                        //     </div>
+                        //   </DataTableCell>
+                        // );
+                      })}
+                    </DataTableRow>
+                  );
+                })}
+              </TableBody>
+              <Divider />
+            </div>
+          );
+        })}
+      </DataTable>
+    </div>
   );
 }

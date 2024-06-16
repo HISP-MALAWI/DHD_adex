@@ -22,7 +22,7 @@ import {
   Center,
   CircularLoader,
 } from "@dhis2/ui";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useState, useContext } from "react";
 import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
@@ -37,6 +37,7 @@ export default function TransactionPreview(props) {
   const { transactionById } = useContext(TransactionContext);
   const endpoint = "https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
   // const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
+  const navigate = useNavigate();
   const { ipAddress } = useContext(IPAddressContext);
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -141,30 +142,14 @@ export default function TransactionPreview(props) {
   };
 
   //pushing the to dataStore
-  const pushToDataStore = async (trigger) => {
-    let state =
-      trigger === "draft"
-        ? "draft"
-        : trigger === "success"
-        ? "success"
-        : "failed";
-    // const Object = {
-    //   id: `OPEN-${Date.now()}`,
-    //   user_id: props?.data?.me,
-    //   analytics: analytics,
-    //   name: transName,
-    //   date: new Date().toDateString(),
-    //   description: transactionById?.description,
-    //   status: state,
-    //   approved: false,
-    // };
+  const pushToDataStore = async (state) => {
     transactionById.status = state;
     const myMutation = {
       resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${
-        transactionById.id.split("-")[0]
+        transactionById.id.split("-")[1]
       }`,
       type: "update",
-      data: Object,
+      data: transactionById,
     };
     await engine
       .mutate(myMutation)
@@ -198,31 +183,32 @@ export default function TransactionPreview(props) {
     ) {
       // console.log({ IP: ipAddress });
     } else {
-      let ip = crypto.decrypt(ipAddress?.address);
+      let ip = ipAddress && crypto.decrypt(ipAddress?.address);
       if (ip == null || ip == undefined || ip == "") {
-        // console.log({ fail: "failed", ip, ipAddress });
+        console.log({ fail: "failed", ip, ipAddress });
       } else {
-        // console.log({ pass: "pass", ip, ipAddress });
-        // await axios
-        //   .post(
-        //     ip,
-        //     py
-        //     //{headers}
-        //   )
-        //   .then((res) => {
-        //     setError(false);
-        //     setMessage("Data sucessifuly submit to Global fund");
-        //     setHidden(false);
-        //     pushToDataStore("success");
-        //   })
-        //   .catch((e) => {
-        //     setError(true);
-        //     setMessage(
-        //       "Failled to submit data to datastore please try again some time"
-        //     );
-        //     setHidden(false);
-        //     pushToDataStore("failed");
-        //   });
+        await axios
+          .post(
+            ip,
+            py
+            //{headers}
+          )
+          .then((res) => {
+            console.log(res);
+            setError(false);
+            setMessage("Data sucessifuly submit to Global fund");
+            setHidden(false);
+            pushToDataStore("success");
+          })
+          .catch((e) => {
+            console.log(e);
+            setError(true);
+            setMessage(
+              "Failled to submit data to datastore please try again some time"
+            );
+            setHidden(false);
+            pushToDataStore("failed");
+          });
       }
     }
   };
