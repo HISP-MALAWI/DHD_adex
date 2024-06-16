@@ -44,7 +44,7 @@ You can learn more about the runtime in the [DHIS2 Application Runtime Documenta
 
 To learn React, check out the [React documentation](https://reactjs.org/).
 
-Transaction Preview React Functional Component
+## Transaction Preview React Functional Component
 
 This component allows users to review and approve transactions before submission.
 
