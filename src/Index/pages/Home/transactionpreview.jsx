@@ -1,5 +1,5 @@
-import { Box, Card, NoticeBox,AlertBar, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip, Layer, Center, CircularLoader } from "@dhis2/ui";
-import { Link, useLocation} from "react-router-dom";
+import { Box, Divider, Card, NoticeBox, AlertBar, Button, StackedTable, StackedTableHead, StackedTableRowHead, StackedTableCellHead, StackedTableBody, StackedTableRow, StackedTableCell, ButtonStrip, Layer, Center, CircularLoader } from "@dhis2/ui";
+import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Preview from "../../../widgets/preview.widgets";
 import { useDataEngine } from "@dhis2/app-runtime";
@@ -9,13 +9,13 @@ import axios from "axios";
 
 export default function TransactionPreview(props) {
   const endpoint = "https://sheetdb.io/api/v1/5acdlu0ba0l47?sheet=openlmis";
-  const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q"; 
+  const token = "7imn7rlmh0i1psm6u09qicg6zoqnh8ujiklba87q";
   const location = useLocation()
   const [loading, setLoading] = useState(true);
   const engine = useDataEngine();
-  const [payload,setPayload] = useState()
+  const [payload, setPayload] = useState()
   const [transactions, setTransactions] = useState({});
-  const [error,setError] = useState(true)
+  const [error, setError] = useState(true)
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
     "Failled to submit payload to Globalfund"
@@ -40,14 +40,14 @@ export default function TransactionPreview(props) {
     try {
       const res = await engine.query(myQuery);
       setTransactions(res?.dataStore)
-      setLoading(false)      
+      setLoading(false)
     } catch (e) {
       setLoading(false)
       console.log(e);
     }
   };
 
-  const submit = async() => {
+  const submit = async () => {
     setLoading(true)
     const id = location.search.split('=')[1]
     const headers = {
@@ -68,13 +68,13 @@ export default function TransactionPreview(props) {
         description: transactions?.description,
       }),
       { headers }).then(async res => {
-        const myMutation ={ ... transactions,status : "success"}
+        const myMutation = { ...transactions, status: "success" }
         const myQuery = {
-            resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${id}`,
-            type : 'update',
-            data : myMutation
-          }
-         await engine.mutate(myQuery).then(res => {
+          resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${id}`,
+          type: 'update',
+          data: myMutation
+        }
+        await engine.mutate(myQuery).then(res => {
           setError(false)
           setMessage("Payload sucessifuly submited to Global fund")
           setHidden(false)
@@ -84,27 +84,27 @@ export default function TransactionPreview(props) {
           setError(true)
           setHidden(false)
         })
-        }).catch(e => {
-          setLoading(false)
-          setLoading(false)
-          setError(true)
-          setHidden(false)
-        })
+      }).catch(e => {
+        setLoading(false)
+        setLoading(false)
+        setError(true)
+        setHidden(false)
+      })
   }
-  
+
   useEffect(() => {
-    getTransactions(location.search.split('=')[1]);    
+    getTransactions(location.search.split('=')[1]);
   }, []);
   return (
     <div>
       {loading && <Layer translucent>
         <Center>
           <CircularLoader /></Center></Layer>}
-      <div style={{width: "100", display:'flex',justifyContent:'space-between', padding: 10}}>
-      <Link to={"/"} style={{textDecoration: "none", color: "#fff"}}>
-        <Button secondary>
-          Back
-        </Button>
+      <div style={{ width: "100", display: 'flex', justifyContent: 'space-between', padding: 10 }}>
+        <Link to={"/"} style={{ textDecoration: "none", color: "#fff" }}>
+          <Button secondary>
+            Back
+          </Button>
         </Link>
         <div>
           Transaction preview
@@ -151,41 +151,60 @@ export default function TransactionPreview(props) {
         </StackedTable>
       </div>
       <div className="">
-        {transactions?.analytics !== undefined && 
-         <Preview
-              analytics={transactions?.analytics
-              }
-              styles={props.styles}
-              setPayload={setPayload}
-            />
-}
+        {transactions?.analytics !== undefined &&
+          <Preview
+            analytics={transactions?.analytics
+            }
+            styles={props.styles}
+            setPayload={setPayload}
+          />
+        }
       </div>
-      <div style={{padding : '10px'}}>
-      <ButtonStrip end>
-      {transactions?.status === 'draft' && <Button primary onClick={()=> submit()}>
-          Submit
-        </Button>}
-      </ButtonStrip>
+      {
+        transactions?.status === 'draft' &&
+        <div style={{ padding: '10px', marginTop: "10px" }}>
+         
+         <div className="" style={{ marginTop: "10px" }}/>
+          <ButtonStrip start>
+            <Button secondary onClick={() => submit()} small>
+              Validate
+            </Button>
+          </ButtonStrip>
+        </div>
+      }
+
+      <div style={{ padding: '10px' }}>
+      <NoticeBox>Validate the Payload</NoticeBox>
+      <div className="" style={{ marginTop: "10px" }}/>
+        <ButtonStrip start>
+          {transactions?.status === 'draft' && <Button secondary onClick={() => submit()} small>
+            Validate
+          </Button>}
+          {transactions?.status === 'draft' && <Button primary onClick={() => submit()} small>
+            Submit
+          </Button>}
+        </ButtonStrip>
       </div>
       <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: "50%",
-            left: "40%",
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: "50%",
+          left: "40%",
+        }}
+      >
+        <AlertBar
+          warning={error}
+          success={!error}
+          hidden={hide}
+          onHidden={() => {
+            setHidden(true)
           }}
+          duration={2000}
         >
-          <AlertBar
-            warning={error}
-            success={!error}
-            hidden={hide}
-            onHidden={() => {
-              setHidden(true)}}
-            duration={2000}
-          >
-            {message}
-          </AlertBar>
-        </div>
+          {message}
+        </AlertBar>
+      </div>
     </div>
   );
 }

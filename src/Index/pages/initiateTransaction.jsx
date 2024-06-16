@@ -226,7 +226,7 @@ function InitiateTransaction(props) {
       setHidden(false);
     } else {
       if (trigger === "draft") {
-        console.log(trigger);
+        // console.log(trigger);
         pushToDataStore(trigger);
       } else {
         //pushing data to Snowflake
@@ -241,7 +241,7 @@ function InitiateTransaction(props) {
 
   useEffect(() => {
     fetchAnalytics();
-    console.log(orgUnits)
+    // console.log(orgUnits)
   }, [periods, dataElementGroup, orgUnit,orgUnits]);
 
   useEffect(() => {
@@ -310,7 +310,6 @@ function InitiateTransaction(props) {
           </Button>
           <div style={{ fontSize: 26 }}>
               <span style={{ padding: 10 }}>Initiate Transaction</span>
-            
           </div>
           <div>
           <EditModal periods={periods} setPeriod={setPeriod} />
@@ -401,13 +400,13 @@ function InitiateTransaction(props) {
             >
               Save as Draft
             </Button>
-            <Button
+            {/* <Button
               primary
               disabled={disabled}
               onClick={()=>setOpen(true)}
             >
               Submit
-            </Button>
+            </Button> */}
           </ButtonStrip>
         </div>
         <div
