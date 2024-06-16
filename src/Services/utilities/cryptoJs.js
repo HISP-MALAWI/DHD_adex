@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 
 class useCrypto {

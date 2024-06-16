@@ -14,7 +14,6 @@ export default function TransactionContextProvider({ children }) {
     const data = TransactionsController.getTransactions(engine);
     const res = await data;
     if (res?.error == false) {
-      console.log(res.data);
       setTransactions(res.data?.sort((a, b) => new Date(a?.value?.date) - new Date(b?.value?.date)));
     } else {
     }

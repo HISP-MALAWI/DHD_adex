@@ -19,15 +19,18 @@ import IPAddressContext from "../../../context/contexts/IPAddressContext";
 const crypto = new useCrypto();
 export default function ConfigurationsPage({ user }) {
   const { ipAddress } = useContext(IPAddressContext);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const engine = useDataEngine();
   const [error, setError] = useState(true);
-  const [ipAddressValue, setIpAddressValue] = useState({});
-  const path = `dataStore/OpenLMIS_SnowFlake_Intergration_Protocol/protocol`;
+  const [ipAddressValue, setIpAddressValue] = useState("");
+  const path = "dataStore/OpenLMIS_SnowFlake_Intergration_Protocol/protocol";
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
     "Failled to submit payload to Globalfund"
   );
+  const IP = Object.keys(ipAddress)?.length > 0 ? crypto.decrypt(ipAddress?.address) : <CircularLoader aria-label
+    ="ExtraSmall  Loader" extrasmall
+  />
   const updateIpAddress = async ({ user }) => {
     if (
       ipAddressValue == "" ||
@@ -36,38 +39,7 @@ export default function ConfigurationsPage({ user }) {
     ) {
     } else {
       let encryptedId = crypto.encrypt(ipAddressValue);
-
-      try {
-        // Attempt to read the data
-        const result = await engine.query({
-          resource: path,
-          params: {
-            field: ["id,name"],
-          },
-        });
-        // const ipAddressUpdatePayload = {
-        //   resource: path,
-        //   type: "update",
-        //   data: {
-        //     address: encryptedId,
-        //     created: "",
-        //     updated: new Date().toDateString(),
-        //     createdby: user,
-        //   },
-        // };
-        // await engine
-        //   .mutate(ipAddressUpdatePayload)
-        //   .then((res) => {
-        //     if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
-        //       console.log(res);
-        //     }
-        //   })
-        //   .catch((e) => {
-        //     console.log({ e, error });
-        //   });
-        // If the 'read' operation is successful, the namespace and key exist
-        console.log(result);
-      } catch (error) {
+      if (ipAddress?.error == true) {
         const ipAddressCreatePayload = {
           resource: path,
           type: "create",
@@ -89,22 +61,39 @@ export default function ConfigurationsPage({ user }) {
           .catch((e) => {
             console.log({ e, error });
           });
+
+      } else {
+        ipAddress.address = encryptedId
+        ipAddress.updated = user
+        ipAddress.updatedAt = new Date().toDateString()
+        const ipAddressUpdatePayload = {
+          resource: path,
+          type: "update",
+          data: ipAddress
+        };
+        setLoading(true)
+        await engine
+          .mutate(ipAddressUpdatePayload)
+          .then((res) => {
+            if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
+              setLoading(false)
+              console.log(res);
+            }
+          })
+          .catch((e) => {
+            console.log({ e, error });
+          });
       }
+
     }
   };
 
   useEffect(() => {
-    console.log(ipAddress);
+    console.log({ ipAddress, IP });
   });
   return (
     <div>
-      {!loading && (
-        <Layer translucent>
-          <Center>
-            <CircularLoader />
-          </Center>
-        </Layer>
-      )}
+
       <div className="" style={{ padding: "10px" }}>
         <Card>
           <div
@@ -139,11 +128,9 @@ export default function ConfigurationsPage({ user }) {
                 <div className="" style={{ marginBottom: "10px" }}>
                   <span>
                     Current Destination Ip Address:
-                    <Chip>
-                      {(ipAddress != undefined ||
-                        ipAddress != "" ||
-                        ipAddress != null) &&
-                        crypto.decrypt(ipAddress?.address)}
+
+                    <Chip dense>
+                      {IP}
                     </Chip>
                   </span>
                 </div>
@@ -155,9 +142,14 @@ export default function ConfigurationsPage({ user }) {
                     <Input onChange={(e) => setIpAddressValue(e.value)} />
                   </Field>
                 </div>
-                <Button small primary onClick={updateIpAddress}>
-                  Update
-                </Button>
+                {
+                  (ipAddressValue != "" || ipAddressValue != undefined || ipAddressValue != null) &&
+                  <Button small primary onClick={updateIpAddress}>
+                    Update {loading && <CircularLoader aria-label
+                      ="ExtraSmall  Loader" extrasmall
+                    />}
+                  </Button>
+                }
               </div>
             ) : (
               <span style={{ color: "black" }}>
