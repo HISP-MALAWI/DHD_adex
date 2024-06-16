@@ -43,3 +43,20 @@ You can learn more about the platform in the [DHIS2 Application Platform Documen
 You can learn more about the runtime in the [DHIS2 Application Runtime Documentation](https://runtime.dhis2.nu/).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+Transaction Preview React Functional Component
+
+This component allows users to review and approve transactions before submission.
+
+Features
+
+    View transaction details, including ID, name, description, and status.
+    Approve or deny transactions based on user roles.
+    Submit approved transactions to a specified destination.
+
+Usage
+
+    Back Button: Navigate back to the main page.
+    Transaction Preview: Displays transaction details.
+    Approve Button: If you have the appropriate user role, approve the transaction.
+    Submit Button: If approved, submit the transaction to the specified destination.
