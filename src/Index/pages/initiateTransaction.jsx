@@ -11,7 +11,7 @@ import {
   Modal,
   ModalTitle,
   ModalActions,
-  ModalContent
+  ModalContent,
 } from "@dhis2/ui";
 import React, { useState, useEffect } from "react";
 import EditModal from "../../widgets/editModal.widget";
@@ -44,14 +44,10 @@ const myQuery = {
     params: {
       paging: false,
       filter: "code:eq:GlobalFundOpenLMISADEx",
-      fields: [
-        "id,name,code,organisationUnits(id,name,code)",
-      ],
+      fields: ["id,name,code,organisationUnits(id,name,code)"],
     },
   },
 };
-
-
 
 function InitiateTransaction(props) {
   const navigate = useNavigate();
@@ -60,7 +56,7 @@ function InitiateTransaction(props) {
   const [dataElementGroup, setElementGroupe] = useState([]);
   const [orgUnit, setOU] = useState([]);
   const [orgUnits, setOrgUnits] = useState([]);
-  const [payload,setPayload] = useState()
+  const [payload, setPayload] = useState();
   const [loading, setLoading] = useState(true);
   const [hide, setHidden] = useState(true);
   const [message, setMessage] = useState(
@@ -71,10 +67,10 @@ function InitiateTransaction(props) {
   const [descError, setDescError] = useState(false);
   const [transName, setName] = useState();
   const [transDesc, setDesc] = useState();
-  const [analytics, setAnalytics] = useState();
+  const [analytics, setAnalytics] = useState({});
   const [periods, setPeriod] = useState(["THIS_MONTH"]);
-  const [open,setOpen] = useState(false)
-  const [token, setToken] = useState()
+  const [open, setOpen] = useState(false);
+  const [token, setToken] = useState();
   const [disabled, setDisabled] = useState(true);
 
   const fetchData = async () => {
@@ -104,14 +100,10 @@ function InitiateTransaction(props) {
       let orgUnitsIdList = [];
 
       dataElements.map((dataElement) => dataElementID.push(dataElement.id));
-      GetAnalytics.analytics(
-        engine,
-        dataElementID,
-        periods,
-        groupID
-      )
+      GetAnalytics.analytics(engine, dataElementID, periods, groupID)
         .then((res) => {
-          setAnalytics(res.analytics);
+          console.log(res);
+          setAnalytics(res?.analytics);
           setLoading(false);
         })
         .catch(() => {
@@ -140,6 +132,7 @@ function InitiateTransaction(props) {
       date: new Date().toDateString(),
       description: transDesc,
       status: state,
+      approved: false,
     };
     const myMutation = {
       resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
@@ -165,36 +158,36 @@ function InitiateTransaction(props) {
   };
 
   const transformation = (description) => {
-    let facilities = []
-    payload.map(val => {
+    let facilities = [];
+    payload.map((val) => {
       let facilityCode = val.facilityCode;
-      let values = []
-      val.values.map(v =>{
-        values.push(...v.values)
-      })
+      let values = [];
+      val.values.map((v) => {
+        values.push(...v.values);
+      });
       facilities.push({
-        facilityCode : facilityCode,
-        values: values
-      })
-    })
-    return ( {
+        facilityCode: facilityCode,
+        values: values,
+      });
+    });
+    return {
       description: description,
-      reportingUnit : 'MWI',
-      facilities : facilities
-    })
-  }
+      reportingUnit: "MWI",
+      facilities: facilities,
+    };
+  };
 
   //this function sends data to Mediator application
   const pushToIL = async () => {
     const py = transformation(transDesc);
-    const headers = {      
-      'Access-Control-Allow-Origin': '*'
-    }
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+    };
     await axios
       .post(
         endpoint,
-          py,
-          //{headers}
+        py
+        //{headers}
       )
       .then((res) => {
         setError(false);
@@ -226,11 +219,10 @@ function InitiateTransaction(props) {
       setHidden(false);
     } else {
       if (trigger === "draft") {
-        // console.log(trigger);
         pushToDataStore(trigger);
       } else {
         //pushing data to Snowflake
-        pushToIL();
+        // pushToIL();
       }
     }
   };
@@ -241,11 +233,11 @@ function InitiateTransaction(props) {
 
   useEffect(() => {
     fetchAnalytics();
-    // console.log(orgUnits)
-  }, [periods, dataElementGroup, orgUnit,orgUnits]);
+    // console.log(orgUnits);
+  }, [periods, dataElementGroup, orgUnit, orgUnits]);
 
   useEffect(() => {
-    if (analytics?.rows.length > 0) {
+    if (analytics?.rows?.length > 0) {
       setMessage("No data values found");
       setHidden(false);
       setDisabled(false);
@@ -253,7 +245,7 @@ function InitiateTransaction(props) {
   }, [analytics]);
   return (
     <div>
-    {loading && (
+      {loading && (
         <Layer translucent>
           <Center>
             <CircularLoader />
@@ -261,31 +253,30 @@ function InitiateTransaction(props) {
         </Layer>
       )}
 
-    {open && <Modal onClose={()=> setOpen(false)}>
-      <ModalTitle>
-        Token
-      </ModalTitle>
-      <ModalContent>
-        <Field label="Token">
-          <Input
-          name="token"
-          onChange={(e)=> setToken(e.value)}/>
-        </Field>
-      </ModalContent>
-      <ModalActions>
-        <ButtonStrip end>
-          <Button onClick={()=> setOpen(false)}>
-            Cancel
-          </Button>
-          <Button primary onClick={() => {
-            setOpen(false)
-            submit("success")}
-          }>
-            Submit
-          </Button>
-        </ButtonStrip>
-      </ModalActions>
-      </Modal>}  
+      {open && (
+        <Modal onClose={() => setOpen(false)}>
+          <ModalTitle>Token</ModalTitle>
+          <ModalContent>
+            <Field label="Token">
+              <Input name="token" onChange={(e) => setToken(e.value)} />
+            </Field>
+          </ModalContent>
+          <ModalActions>
+            <ButtonStrip end>
+              <Button onClick={() => setOpen(false)}>Cancel</Button>
+              <Button
+                primary
+                onClick={() => {
+                  setOpen(false);
+                  submit("success");
+                }}
+              >
+                Submit
+              </Button>
+            </ButtonStrip>
+          </ModalActions>
+        </Modal>
+      )}
       <div
         style={{
           padding: "20px",
@@ -293,12 +284,11 @@ function InitiateTransaction(props) {
       >
         <div
           style={{
-            padding: 10,
             width: "100%",
             display: "flex",
-            alignItems : 'center',
-            justifyContent : 'space-between',
-            flexDirection : 'row',
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
 
             gap: 40,
           }}
@@ -309,15 +299,11 @@ function InitiateTransaction(props) {
             </Link>
           </Button>
           <div style={{ fontSize: 26 }}>
-              <span style={{ padding: 10 }}>Initiate Transaction</span>
-          </div>
-          <div>
-          <EditModal periods={periods} setPeriod={setPeriod} />
+            <span style={{ padding: 10 }}>Initiate Transaction</span>
           </div>
         </div>
         <div
           style={{
-            padding: 10,
             marginTop: 20,
           }}
         >
@@ -326,6 +312,9 @@ function InitiateTransaction(props) {
               width: "50%",
             }}
           >
+            <div style={{ marginBottom: "30px", marginTop: "30px" }}>
+              <EditModal periods={periods} setPeriod={setPeriod} />
+            </div>
             <Field label="Transaction name">
               <Input
                 name="TransID"
@@ -354,18 +343,16 @@ function InitiateTransaction(props) {
               />
             </Field>
           </div>
-          <div style={{ marginTop: 10 }}>
-            
-          </div>
+          <div style={{ marginTop: 10 }}></div>
         </div>
         <div
           style={{
-            textAlign: "center",
+            textAlign: "left",
           }}
         >
           <h3>Data Preview</h3>
         </div>
-        {analytics?.rows.length > 0 ? (
+        {analytics?.rows?.length > 0 ? (
           <div
             style={{
               maxWidth: "100%",
@@ -389,22 +376,14 @@ function InitiateTransaction(props) {
         )}
         <div
           style={{
-            padding: "80px",
+            paddingTop: "30px",
           }}
         >
-          <ButtonStrip end>
-            <Button
-              secondary
-              disabled={disabled}
-              onClick={() => submit("draft")}
-            >
+          <ButtonStrip start>
+            <Button primary disabled={disabled} onClick={() => submit("draft")}>
               Save as Draft
             </Button>
-            {/* <Button
-              primary
-              disabled={disabled}
-              onClick={()=>setOpen(true)}
-            >
+            {/* <Button primary disabled={disabled} onClick={() => setOpen(true)}>
               Submit
             </Button> */}
           </ButtonStrip>
