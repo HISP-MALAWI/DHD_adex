@@ -2,31 +2,11 @@ import React, { useEffect, useState } from "react";
 import Noticebox from "../../../widgets/noticeBox.widget";
 import Transactions from "../../../widgets/transactions.widget";
 import { useDataEngine } from "@dhis2/app-runtime";
+import TransactionContext from "../../../context/contexts/TransactionContext";
 
 function Home(props) {
-  const engine = useDataEngine();
-  const [transactions, setTransactions] = useState([]);
-  const getTransactions = async () => {
-    const myQuery = {
-      dataStore: {
-        resource: "dataStore/OpenLMIS_SnowFlake_Intergration",
-        params: {
-          paging: false,
-          fields: ["."],
-        },
-      },
-    };
-    try {
-      const res = await engine.query(myQuery);
-
-      setTransactions(res?.dataStore);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  useEffect(() => {
-    getTransactions();
-  }, []);
+  const {transactions} = useContext(TransactionContext)
+  
   return (
     <div
       style={{
@@ -43,7 +23,7 @@ function Home(props) {
       ) : (
         <>
           {transactions && transactions?.length > 0 ? (
-            <Transactions transactions={transactions?.reverse()} styles={props?.styles}/>
+            <Transactions transactions={transactions} styles={props?.styles}/>
           ) : (
             <span style={{ color: "red", textAlign: "center" }}>
               Transactions will be Loaded here or no transations are available!

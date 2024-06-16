@@ -14,7 +14,8 @@ export default function TransactionContextProvider({ children }) {
     const data = TransactionsController.getTransactions(engine);
     const res = await data;
     if (res?.error == false) {
-      setTransactions(res.data);
+      console.log(res.data);
+      setTransactions(res.data?.sort((a, b) => new Date(a?.value?.date) - new Date(b?.value?.date)));
     } else {
     }
   };
@@ -22,7 +23,7 @@ export default function TransactionContextProvider({ children }) {
   const getTransactionById = async () => {
     const data = TransactionsController.getTransactionById(engine, location);
     const res = await data;
-    // console.log(res);
+   
     if (res?.error == false) {
       setTransactionById(res.data);
     } else {
