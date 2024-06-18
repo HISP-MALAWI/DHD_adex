@@ -121,7 +121,7 @@ function InitiateTransaction(props) {
         : trigger === "success"
         ? "success"
         : "failed";
-    const Object = {
+    const dataPayload = {
       id: `OPEN-${Date.now()}`,
       user_id: props?.data?.me,
       analytics: analytics,
@@ -134,45 +134,89 @@ function InitiateTransaction(props) {
     const myMutation = {
       resource: `dataStore/OpenLMIS_SnowFlake_Intergration/${Date.now()}`,
       type: "create",
-      data: Object,
+      data: dataPayload,
     };
-    await engine
-      .mutate(myMutation)
-      .then((res) => {
-        if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
-          setError(false);
-          setMessage("Transaction successifuly saved to Datastore");
+    console.log({ dataPayload, myMutation });
+    if (
+      props?.userGroups?.userGroups?.filter(
+        (userGroup) => userGroup?.name == "A_OpenLMIS SnowFlakes Approval"
+      )[0] == undefined
+    ) {
+      setError(true);
+      setMessage("No user groups for approvals");
+      setHidden(false);
+      setLoading(false);
+    } else {
+      const messagePayload = {
+        type: "create",
+        resource: "messageConversations",
+        data: {
+          subject: "Request to approve the OpenLMIS Payload",
+          text: `Approved the data prepared for transmission to the snowflakes, prepared on ${new Date().toDateString()}`,
+          userGroups: [
+            {
+              id: props?.userGroups?.userGroups?.filter(
+                (userGroup) =>
+                  userGroup.name == "A_OpenLMIS SnowFlakes Approval"
+              )[0].id,
+            },
+          ],
+        },
+      };
+      await engine
+        .mutate(myMutation)
+        .then((res) => {
+          if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
+            engine
+              .mutate(messagePayload)
+              .then((result) => {
+                if (result.httpStatusCode == 200 || result.httpStatusCode == 201) {
+                  setError(false);
+                  setMessage(
+                    "Transaction successifuly saved as draft, message sent for approval."
+                  );
+                  setHidden(false);
+                  setTimeout(() => navigate("/"), 3000);
+                }
+              })
+              .catch((e) => {
+                setError(false);
+                setMessage(
+                  "Transaction successifuly saved as draft, but failed to alert the approval personnel."
+                );
+                setHidden(false);
+                setTimeout(() => navigate("/"), 3000);
+              });
+          }
+        })
+        .catch((e) => {
+          setError(true);
+          setMessage("failed to save transaction to DataStore");
           setHidden(false);
-          setTimeout(() => navigate("/"), 3000);
-        }
-      })
-      .catch((e) => {
-        setError(true);
-        setMessage("failed to save transaction to DataStore");
-        setHidden(false);
-      });
-    setLoading(false);
+        });
+      setLoading(false);
+    }
   };
 
-  const transformation = (description) => {
-    let facilities = [];
-    payload.map((val) => {
-      let facilityCode = val.facilityCode;
-      let values = [];
-      val.values.map((v) => {
-        values.push(...v.values);
-      });
-      facilities.push({
-        facilityCode: facilityCode,
-        values: values,
-      });
-    });
-    return {
-      description: description,
-      reportingUnit: "MWI",
-      facilities: facilities,
-    };
-  };
+  // const transformation = (description) => {
+  //   let facilities = [];
+  //   payload.map((val) => {
+  //     let facilityCode = val.facilityCode;
+  //     let values = [];
+  //     val.values.map((v) => {
+  //       values.push(...v.values);
+  //     });
+  //     facilities.push({
+  //       facilityCode: facilityCode,
+  //       values: values,
+  //     });
+  //   });
+  //   return {
+  //     description: description,
+  //     reportingUnit: "MWI",
+  //     facilities: facilities,
+  //   };
+  // };
 
   //this function sends data to Mediator application
   // const pushToIL = async () => {
@@ -230,7 +274,7 @@ function InitiateTransaction(props) {
 
   useEffect(() => {
     fetchAnalytics();
-    // console.log(orgUnits);
+    console.log(props?.userGroups?.userGroups);
   }, [periods, dataElementGroup, orgUnit, orgUnits]);
 
   useEffect(() => {
@@ -392,9 +436,7 @@ function InitiateTransaction(props) {
             left: "50%",
             left: "40%",
           }}
-        >
-         
-        </div>
+        ></div>
       </div>
     </div>
   );

@@ -80,44 +80,61 @@ export default function TransactionPreview(props) {
       } else {
         mm = data?.comment;
       }
-      const messagePayload = {
-        type: "create",
-        resource: "messageConversations",
-        data: {
-          subject:
-            data.status == "fail"
-              ? "OpenLMIS Payload approval failed"
-              : "OpenLMIS Payload approved",
-          text: mm,
-          userGroups: [
-            {
-              id: props?.user?.userGroups.filter(
-                (userGroup) =>
-                  userGroup.name == "A_OpenLMIS SnowFlakes Approval"
-              )[0].id,
-            },
-          ],
-        },
-      };
-      await engine
-        .mutate(dataLayout)
-        .then((res) => {
-          if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
-            engine
-              .mutate(messagePayload)
-              .then((res) => {
-                if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
-                  console.log(res);
-                }
-              })
-              .catch((e) => {
-                console.log(e);
-              });
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      if (
+        props?.userGroups?.userGroups?.filter(
+          (userGroup) => userGroup?.name == "A_OpenLMIS_SF_Admin"
+        )[0] == undefined
+      ) {
+        setError(true);
+        setHidden(false);
+        setMessage("No user group is defined to send an approval message to.");
+      } else {
+        const messagePayload = {
+          type: "create",
+          resource: "messageConversations",
+          data: {
+            subject:
+              data.status == "fail"
+                ? "OpenLMIS Payload approval failed"
+                : "OpenLMIS Payload approved",
+            text: mm,
+            userGroups: [
+              {
+                id: props?.userGroups?.userGroups?.filter(
+                  (userGroup) => userGroup?.name === "A_OpenLMIS_SF_Admin"
+                )[0].id,
+              },
+            ],
+          },
+        };
+        await engine
+          .mutate(dataLayout)
+          .then((res) => {
+            if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
+              engine
+                .mutate(messagePayload)
+                .then((res) => {
+                  if (res.httpStatusCode == 200 || res.httpStatusCode == 201) {
+                    console.log(res);
+                    setError(false);
+                    setHidden(false);
+                    setMessage("Successful, and message sent for submission.");
+                  }
+                })
+                .catch((e) => {
+                  console.log(e);
+                  setError(true);
+                  setHidden(false);
+                  setMessage(
+                    "Approved Successfully, but failed to send approval message."
+                  );
+                });
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
     }
   };
 
@@ -185,7 +202,6 @@ export default function TransactionPreview(props) {
     } else {
       let ip = ipAddress && crypto.decrypt(ipAddress?.address);
       if (ip == null || ip == undefined || ip == "") {
-        console.log({ fail: "failed", ip, ipAddress });
       } else {
         await axios
           .post(
@@ -194,14 +210,12 @@ export default function TransactionPreview(props) {
             //{headers}
           )
           .then((res) => {
-            console.log(res);
             setError(false);
             setMessage("Data sucessifuly submit to Global fund");
             setHidden(false);
             pushToDataStore("success");
           })
           .catch((e) => {
-            console.log(e);
             setError(true);
             setMessage(
               "Failled to submit data to datastore please try again some time"
@@ -217,7 +231,13 @@ export default function TransactionPreview(props) {
     // setLoading(true);
     pushToIL();
   };
-
+  useEffect(() => {
+    console.log(
+      props?.userGroups?.userGroups?.filter(
+        (userGroup) => userGroup?.name === "A_OpenLMIS_SF_Admin"
+      )[0].id
+    );
+  });
   return (
     <div>
       {!loading && (
@@ -319,7 +339,7 @@ export default function TransactionPreview(props) {
               <StackedTableCell>
                 <ButtonStrip start>
                   <div className="" style={{ paddingTop: "10px" }}>
-                    {props?.user?.userRoles.filter(
+                    {props?.user?.userGroups.filter(
                       (user) => user.name == "A_OpenLMIS SnowFlakes Approval"
                     )?.length > 0 ? (
                       <Button basic onClick={() => setOpenApprove(true)} small>
@@ -334,7 +354,7 @@ export default function TransactionPreview(props) {
               <StackedTableCell>
                 <ButtonStrip start>
                   <div style={{ paddingTop: "10px" }}>
-                    {props?.user?.userRoles.filter(
+                    {props?.user?.userGroups.filter(
                       (user) => user.name == "A_OpenLMIS_SF_Admin"
                     )?.length > 0 && transactionById?.approved == true ? (
                       <Button primary small onClick={() => setOpenSubmit(true)}>

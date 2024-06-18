@@ -10,7 +10,6 @@ import { HashRouter, Routes, Route, BrowserRouter } from "react-router-dom";
 import { QueryParamProvider } from "use-query-params";
 import InitiateTransaction from "./Index/pages/initiateTransaction";
 import TransactionPreview from "./Index/pages/Home/transactionpreview";
-import TransactionContextProvider from "./context/providers/TransactionContextProvider";
 import ProviderController from "./context/providers/ProviderController";
 import ConfigurationsPage from "./Index/pages/Home/configurations";
 const query = {
@@ -20,6 +19,13 @@ const query = {
       fields: [
         "id,name,email,userRoles(id,name,displayName),userGroups(id,name,displayName)",
       ],
+    },
+  },
+  userGroups: {
+    resource: "userGroups",
+    params: {
+      // filter: "name:eq:A_OpenLMIS_SF_Admin",
+      fields: ["id,name,displayName"],
     },
   },
   dataStore: {
@@ -64,7 +70,7 @@ const MyApp = ({ router: Router }) => (
                     <Route
                       path="/initiate-transaction"
                       element={
-                        <InitiateTransaction data={data} styles={classes} />
+                        <InitiateTransaction data={data} styles={classes} userGroups={data?.userGroups}/>
                       }
                       exact
                     />
@@ -73,6 +79,7 @@ const MyApp = ({ router: Router }) => (
                       element={
                         <TransactionPreview
                           user={data?.me}
+                          userGroups={data?.userGroups}
                           analytics={data}
                           styles={classes}
                         />
